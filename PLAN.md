@@ -67,6 +67,48 @@ type Collection = {
 
 Implementation should use generated IDs, timestamps maintained in one persistence layer, and foreign-key cleanup when notes or collections are removed. If soft deletion is chosen, add a deletion timestamp rather than changing the core relationship model.
 
+## GitHub Pages preparation
+
+The target deployment is the organization site at `https://starkeep-notes.github.io/`, not the current project-site URL. Before application scaffolding:
+
+### Organization and repository setup
+
+- Confirm the `starkeep-notes` organization has Pages enabled and that the organization permits GitHub Actions for the repository.
+- Create or rename the deployment repository to exactly `starkeep-notes.github.io`.
+- Keep the repository public unless GitHub Pages availability for the organization’s plan has been explicitly verified for private repositories.
+- Protect `main` and require pull-request review if the repository will have multiple contributors.
+- Configure a repository-level Pages deployment source of **GitHub Actions**, not a committed `gh-pages` branch.
+- Confirmed repository: `starkeep-notes/starkeep-notes.github.io`.
+- Confirmed Pages URL: `https://starkeep-notes.github.io/`.
+- Confirmed Pages deployment source: GitHub Actions workflow from `main`.
+- Use that exact origin for storage testing.
+
+### Repository files and configuration
+
+- Add `package.json`, lockfile, TypeScript/Vite configuration, and a reproducible Node.js version declaration such as `.nvmrc` or `engines`.
+- Set Vite `base: "/"` for the organization site repository.
+- Use `HashRouter` so refreshes and shared links do not require server-side route fallback support.
+- Add a GitHub Actions workflow that installs from the lockfile, runs lint/tests/build, uploads `dist/`, and deploys with the official Pages actions.
+- Add Pages permissions for the workflow: `contents: read`, `pages: write`, and `id-token: write`.
+- Add a concurrency rule so an obsolete deployment cannot race the current deployment.
+- Ensure the build does not require secrets, backend environment variables, or private package registries.
+- Add a `404.html` only if the final routing strategy or Pages behavior requires it; it is not needed for hash routing.
+
+### Organization and repository security
+
+- Enable two-factor authentication for organization members and use least-privilege repository roles.
+- Review Actions settings and allow only the actions needed by the deployment workflow.
+- Do not store notebook data, credentials, or personal notes in the repository; GitHub Pages hosts only the static application bundle.
+- Decide whether Dependabot alerts, security updates, and secret scanning are available and enable them where appropriate.
+- If a custom domain is desired, configure it at the organization/repository Pages settings and DNS provider, then commit a `CNAME` file only after the domain is chosen.
+
+### Deployment validation
+
+- Test the production build locally before enabling Pages.
+- After deployment, test the exact Pages origin in a clean browser profile: initial load, refresh on every hash route, browser back/forward, asset loading, IndexedDB persistence, image storage, export, and import.
+- Verify that browser storage is scoped to `https://starkeep-notes.github.io` and document that moving to another origin requires export/import.
+- Keep a recovery path for failed deployments: the previous successful Pages deployment and a local JSON notebook backup.
+
 ## Technical approach
 
 1. **Application shell**
