@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { HashRouter, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 import 'quill/dist/quill.snow.css'
 import './App.css'
@@ -6,8 +6,9 @@ import './Notebook.css'
 import { database } from './db'
 import type { Collection } from './types'
 import { NotesPage } from './NotesPage'
+import { exportBackup, importBackup } from './portability'
 
-const navigation = [{ label: 'All notes', path: '/', icon: '☰' }, { label: 'Collections', path: '/collections', icon: '▦' }, { label: 'Web references', path: '/references', icon: '↗' }, { label: 'Board', path: '/board', icon: '▤' }, { label: 'Trash', path: '/trash', icon: '♻' }]
+const navigation = [{ label: 'All notes', path: '/', icon: '☰' }, { label: 'Collections', path: '/collections', icon: '▦' }, { label: 'Web references', path: '/references', icon: '↗' }, { label: 'Board', path: '/board', icon: '▤' }, { label: 'Trash', path: '/trash', icon: '♻' }, { label: 'Backup & recovery', path: '/backup', icon: '⇅' }]
 const themes = ['sticker', 'quiet', 'dark'] as const
 type Theme = typeof themes[number]
 const themeLabels: Record<Theme, string> = { sticker: 'Sticker', quiet: 'Quiet minimal', dark: 'Dark ink' }
@@ -25,6 +26,14 @@ function CollectionsPage() {
   return <section className="page"><p className="eyebrow">Notebook</p><h1>Collections</h1><p className="muted">Organize notes into projects, subjects, and workflows.</p><div className="collection-form"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="New collection" /><select value={parentId} onChange={(event) => setParentId(event.target.value)} aria-label="Parent collection"><option value="">Top-level collection</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{label(collection)}</option>)}</select><button className="primary-button" type="button" onClick={add}>Add</button></div><div className="collection-list">{collections.map((collection) => <div className="collection-row" key={collection.id}>{label(collection)}<small>{new Date(collection.updatedAt).toLocaleDateString()}</small></div>)}</div></section>
 }
 function PlaceholderPage({ title, description }: { title: string; description: string }) { return <section className="page"><p className="eyebrow">Notebook</p><h1>{title}</h1><p className="muted">{description}</p></section> }
+function PortabilityPage() {
+  const [status, setStatus] = useState('')
+  const [error, setError] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
+  const download = async () => { const payload = await exportBackup(); const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `starkeep-backup-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(url); setStatus('Backup downloaded.'); setError('') }
+  const choose = async (mode: 'merge' | 'replace') => { const file = fileRef.current?.files?.[0]; if (!file) { setError('Choose a JSON backup first.'); return } if (mode === 'replace' && !window.confirm('Replace all notes, collections, and references on this device?')) return; try { const payload = JSON.parse(await file.text()) as unknown; const result = await importBackup(payload, mode); setStatus(`Imported ${result.notes} notes, ${result.collections} collections, and ${result.webReferences} references. Reload to view them.`); setError('') } catch (cause) { setStatus(''); setError(cause instanceof Error ? cause.message : 'The backup could not be imported.') } }
+  return <section className="page"><p className="eyebrow">Notebook</p><h1>Backup & recovery</h1><p className="muted">Export a versioned JSON backup or restore one from another device.</p><div className="portability-card"><button className="primary-button" type="button" onClick={() => void download()}>↓ Export backup</button><label className="file-picker">Import JSON backup<input ref={fileRef} type="file" accept="application/json,.json" /></label><div className="portability-actions"><button className="text-button" type="button" onClick={() => void choose('merge')}>Merge backup</button><button className="text-button danger" type="button" onClick={() => void choose('replace')}>Replace notebook</button></div>{status && <p className="success-message" role="status">{status}</p>}{error && <p className="error-message" role="alert">{error}</p>}</div></section>
+}
 function NotebookShell({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => void }) {
   const navigate = useNavigate()
   const [newNoteRequest, setNewNoteRequest] = useState(0)
@@ -37,7 +46,7 @@ function NotebookShell({ theme, setTheme }: { theme: Theme; setTheme: (theme: Th
       <label className="theme-switcher"><span className="theme-icon" aria-hidden="true">◐</span><span className="theme-label">Theme</span><select aria-label="Choose visual theme" value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>{themes.map((item) => <option key={item} value={item}>{themeLabels[item]}</option>)}</select></label>
       <div className="sidebar-footer"><span className="status-dot" /> <span>Saved on this device</span></div>
     </aside>
-    <main className="main-content"><Routes><Route path="/" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/notes/:noteId" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main>
+    <main className="main-content"><Routes><Route path="/" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/notes/:noteId" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/backup" element={<PortabilityPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main>
   </div>
 }
 function App() {
