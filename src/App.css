@@ -34,6 +34,25 @@ h2 { margin: 16px 0 8px; font-size: 25px; letter-spacing: -.04em; }
 .empty-state { margin-top: 48px; padding: 80px 24px; border: 1px dashed #cbd5c4; border-radius: 16px; text-align: center; background: rgba(255,255,255,.6); }
 .empty-state p { margin: 0 auto 24px; max-width: 390px; color: var(--muted); }
 .empty-icon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--sage); color: var(--green); font-size: 25px; }
+.note-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
+.note-card { padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: white; cursor: pointer; }
+.note-card:hover { border-color: #a9bda4; box-shadow: 0 8px 20px rgba(39, 61, 39, .06); }
+.note-card h2 { margin-top: 0; font-size: 20px; }
+.note-card p { min-height: 48px; color: var(--muted); white-space: pre-wrap; overflow: hidden; }
+.note-card small, .collection-row small { color: var(--muted); }
+.card-actions { margin-top: 16px; }
+.text-button { border: 0; padding: 0; background: transparent; color: var(--green); font-weight: 600; }
+.text-button.danger { color: #a14d42; }
+.editor-panel { max-width: 800px; margin: 0 auto; }
+.editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.save-state { color: var(--muted); font-size: 13px; }
+.title-input { width: 100%; border: 0; border-bottom: 1px solid var(--line); padding: 0 0 12px; background: transparent; color: var(--ink); font-size: 38px; font-weight: 700; outline: none; }
+.quill-editor { margin-top: 30px; background: white; }
+.quill-editor .ql-editor { min-height: 360px; font-size: 17px; line-height: 1.7; }
+.collection-form { display: flex; gap: 10px; margin-top: 40px; }
+.collection-form input { flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 12px; }
+.collection-list { display: grid; gap: 8px; margin-top: 20px; }
+.collection-row { display: flex; justify-content: space-between; padding: 16px; border: 1px solid var(--line); border-radius: 9px; background: white; }
 @media (max-width: 700px) { .app-shell { display: block; } .sidebar { width: 100%; padding: 18px 20px; border-right: 0; border-bottom: 1px solid var(--line); } .sidebar-label { margin: 20px 0 8px; } nav { display: flex; overflow-x: auto; } nav a { white-space: nowrap; } .sidebar-footer { display: none; } .main-content { padding: 42px 20px; } .page-heading { align-items: start; flex-direction: column; } }
 
 .counter {
