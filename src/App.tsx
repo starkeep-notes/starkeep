@@ -13,10 +13,12 @@ const newId = () => crypto.randomUUID()
 function CollectionsPage() {
   const [collections, setCollections] = useState<Collection[]>([])
   const [name, setName] = useState('')
+  const [parentId, setParentId] = useState('')
   const load = () => void database.collections.toArray().then(setCollections)
   useEffect(() => { load() }, [])
-  const add = async () => { if (!name.trim()) return; const timestamp = now(); await database.collections.add({ id: newId(), name: name.trim(), createdAt: timestamp, updatedAt: timestamp }); setName(''); load() }
-  return <section className="page"><p className="eyebrow">Notebook</p><h1>Collections</h1><p className="muted">Organize notes into projects, subjects, and workflows.</p><div className="collection-form"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="New collection" /><button className="primary-button" type="button" onClick={add}>Add</button></div><div className="collection-list">{collections.map((collection) => <div className="collection-row" key={collection.id}>{collection.name}<small>{new Date(collection.updatedAt).toLocaleDateString()}</small></div>)}</div></section>
+  const add = async () => { if (!name.trim()) return; const timestamp = now(); await database.collections.add({ id: newId(), name: name.trim(), parentId: parentId || undefined, createdAt: timestamp, updatedAt: timestamp }); setName(''); setParentId(''); load() }
+  const label = (collection: Collection) => { const parent = collection.parentId ? collections.find((item) => item.id === collection.parentId) : undefined; return parent ? `${parent.name} / ${collection.name}` : collection.name }
+  return <section className="page"><p className="eyebrow">Notebook</p><h1>Collections</h1><p className="muted">Organize notes into projects, subjects, and workflows.</p><div className="collection-form"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="New collection" /><select value={parentId} onChange={(event) => setParentId(event.target.value)} aria-label="Parent collection"><option value="">Top-level collection</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{label(collection)}</option>)}</select><button className="primary-button" type="button" onClick={add}>Add</button></div><div className="collection-list">{collections.map((collection) => <div className="collection-row" key={collection.id}>{label(collection)}<small>{new Date(collection.updatedAt).toLocaleDateString()}</small></div>)}</div></section>
 }
 function PlaceholderPage({ title, description }: { title: string; description: string }) { return <section className="page"><p className="eyebrow">Notebook</p><h1>{title}</h1><p className="muted">{description}</p></section> }
 function App() {

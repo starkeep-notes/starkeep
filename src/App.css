@@ -30,7 +30,9 @@ h2 { margin: 16px 0 8px; font-size: 25px; letter-spacing: -.04em; }
 .primary-button { border: 0; border-radius: 9px; padding: 12px 18px; background: var(--green); color: white; font-weight: 600; }
 .primary-button:hover { background: #2d4f2f; }
 .search-field { display: grid; gap: 8px; margin-top: 48px; color: var(--muted); font-size: 13px; font-weight: 600; }
-.search-field input { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 14px 16px; background: white; color: var(--ink); outline-color: var(--green); }
+.search-field input, .filter-field select, .editor-collection select, .collection-form select { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; background: white; color: var(--ink); outline-color: var(--green); }
+.filter-field, .editor-collection { display: grid; gap: 8px; margin-top: 16px; color: var(--muted); font-size: 13px; font-weight: 600; }
+.editor-collection { max-width: 280px; margin-top: 20px; }
 .empty-state { margin-top: 48px; padding: 80px 24px; border: 1px dashed #cbd5c4; border-radius: 16px; text-align: center; background: rgba(255,255,255,.6); }
 .empty-state p { margin: 0 auto 24px; max-width: 390px; color: var(--muted); }
 .empty-icon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--sage); color: var(--green); font-size: 25px; }
@@ -51,7 +53,7 @@ h2 { margin: 16px 0 8px; font-size: 25px; letter-spacing: -.04em; }
 .quill-editor { margin-top: 30px; background: white; }
 .quill-editor .ql-editor { min-height: 360px; font-size: 17px; line-height: 1.7; }
 .collection-form { display: flex; gap: 10px; margin-top: 40px; }
-.collection-form input { flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 12px; }
+.collection-form input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 9px; padding: 12px; } .collection-form select { width: auto; min-width: 180px; }
 .collection-list { display: grid; gap: 8px; margin-top: 20px; }
 .collection-row { display: flex; justify-content: space-between; padding: 16px; border: 1px solid var(--line); border-radius: 9px; background: white; }
 @media (max-width: 700px) { .app-shell { display: block; } .sidebar { width: 100%; padding: 18px 20px; border-right: 0; border-bottom: 1px solid var(--line); } .sidebar-label { margin: 20px 0 8px; } nav { display: flex; overflow-x: auto; } nav a { white-space: nowrap; } .sidebar-footer { display: none; } .main-content { padding: 42px 20px; } .page-heading { align-items: start; flex-direction: column; } }

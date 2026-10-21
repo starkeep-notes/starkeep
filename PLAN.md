@@ -170,6 +170,7 @@ The notebook should feel like a dependable local application, even though its st
 - Add and manage collections.
 - Filter notes by collection.
 - Persist and restore data through Dexie.
+- **Implemented:** notes can be assigned to collections, All notes supports collection filtering/search, and collection creation supports one nested parent level.
 
 ### Phase 2 — Portability and resilience
 
