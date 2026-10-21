@@ -1,6 +1,6 @@
 # Starkeep
 
-Starkeep is a local-first personal notebook for notes, collections, and optional web references.
+Starkeep is a local-first personal notebook for notes, collections, and optional web references. Its compact sticker workspace keeps a searchable note list beside the editor on larger screens and switches to a single-pane view on phones. Use the theme selector in the navigation rail to switch between Sticker, Quiet minimal, and Dark ink; your choice stays on this device.
 
 ## Local development
 

@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
-import { HashRouter, NavLink, Route, Routes } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { HashRouter, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 import 'quill/dist/quill.snow.css'
 import './App.css'
+import './Notebook.css'
 import { database } from './db'
 import type { Collection } from './types'
 import { NotesPage } from './NotesPage'
 
-const navigation = [{ label: 'All notes', path: '/' }, { label: 'Collections', path: '/collections' }, { label: 'Web references', path: '/references' }, { label: 'Board', path: '/board' }, { label: 'Trash', path: '/trash' }]
-const themes = ['quiet', 'workspace', 'dark'] as const
+const navigation = [{ label: 'All notes', path: '/', icon: '☰' }, { label: 'Collections', path: '/collections', icon: '▦' }, { label: 'Web references', path: '/references', icon: '↗' }, { label: 'Board', path: '/board', icon: '▤' }, { label: 'Trash', path: '/trash', icon: '♻' }]
+const themes = ['sticker', 'quiet', 'dark'] as const
 type Theme = typeof themes[number]
-const themeLabels: Record<Theme, string> = { quiet: 'Quiet', workspace: 'Workspace', dark: 'Dark ink' }
+const themeLabels: Record<Theme, string> = { sticker: 'Sticker', quiet: 'Quiet minimal', dark: 'Dark ink' }
 const now = () => Date.now()
 const newId = () => crypto.randomUUID()
 
@@ -24,8 +25,23 @@ function CollectionsPage() {
   return <section className="page"><p className="eyebrow">Notebook</p><h1>Collections</h1><p className="muted">Organize notes into projects, subjects, and workflows.</p><div className="collection-form"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="New collection" /><select value={parentId} onChange={(event) => setParentId(event.target.value)} aria-label="Parent collection"><option value="">Top-level collection</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{label(collection)}</option>)}</select><button className="primary-button" type="button" onClick={add}>Add</button></div><div className="collection-list">{collections.map((collection) => <div className="collection-row" key={collection.id}>{label(collection)}<small>{new Date(collection.updatedAt).toLocaleDateString()}</small></div>)}</div></section>
 }
 function PlaceholderPage({ title, description }: { title: string; description: string }) { return <section className="page"><p className="eyebrow">Notebook</p><h1>{title}</h1><p className="muted">{description}</p></section> }
+function NotebookShell({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => void }) {
+  const navigate = useNavigate()
+  const [newNoteRequest, setNewNoteRequest] = useState(0)
+  const onNewNoteHandled = useCallback(() => setNewNoteRequest(0), [])
+  return <div className={`app-shell theme-${theme}`}>
+    <aside className="sidebar">
+      <div className="brand" aria-label="Starkeep"><span className="brand-mark">✦</span><span className="brand-name">starkeep</span></div>
+      <button className="rail-new" type="button" aria-label="New note" title="New note" onClick={() => { navigate('/'); setNewNoteRequest((value) => value + 1) }}>＋</button>
+      <nav aria-label="Primary navigation">{navigation.map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'} aria-label={item.label} title={item.label} className={({ isActive }) => isActive ? 'active' : ''}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span className="nav-label">{item.label}</span></NavLink>)}</nav>
+      <label className="theme-switcher"><span className="theme-icon" aria-hidden="true">◐</span><span className="theme-label">Theme</span><select aria-label="Choose visual theme" value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>{themes.map((item) => <option key={item} value={item}>{themeLabels[item]}</option>)}</select></label>
+      <div className="sidebar-footer"><span className="status-dot" /> <span>Saved on this device</span></div>
+    </aside>
+    <main className="main-content"><Routes><Route path="/" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/notes/:noteId" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main>
+  </div>
+}
 function App() {
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('starkeep-theme') as Theme) || 'quiet')
+  const [theme, setTheme] = useState<Theme>(() => { const stored = localStorage.getItem('starkeep-theme'); return stored === 'workspace' ? 'sticker' : themes.find((item) => item === stored) ?? 'sticker' })
   const [storageState, setStorageState] = useState<'opening' | 'ready' | 'error'>('opening')
   const [storageError, setStorageError] = useState('')
 
@@ -53,6 +69,6 @@ function App() {
   if (storageState === 'opening') return <main className="app-state" aria-live="polite"><span className="status-dot" /><p>Opening your local notebook…</p></main>
   if (storageState === 'error') return <main className="app-state app-state-error" role="alert"><span className="empty-icon">!</span><h1>Storage unavailable</h1><p>Starkeep could not open its local notebook. Your existing data has not been changed.</p><small>{storageError}</small><button className="primary-button" type="button" onClick={openDatabase}>Try again</button></main>
 
-  return <HashRouter><div className={`app-shell theme-${theme}`}><aside className="sidebar"><div className="brand"><span className="brand-mark">S</span><span>starkeep <small>keep</small></span></div><p className="sidebar-label">Notebook</p><nav aria-label="Primary navigation">{navigation.map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'}>{item.label}</NavLink>)}</nav><div className="theme-switcher" aria-label="Choose visual theme">{themes.map((item) => <button key={item} className={theme === item ? 'selected' : ''} type="button" onClick={() => setTheme(item)}>{themeLabels[item]}</button>)}</div><div className="sidebar-footer"><span className="status-dot" />Local storage ready</div></aside><main className="main-content"><Routes><Route path="/" element={<NotesPage />} /><Route path="/notes/:noteId" element={<NotesPage />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main></div></HashRouter>
+  return <HashRouter><NotebookShell theme={theme} setTheme={setTheme} /></HashRouter>
 }
 export default App
