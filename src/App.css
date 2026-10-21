@@ -21,6 +21,13 @@ nav a { padding: 11px 12px; border-radius: 9px; color: var(--muted); text-decora
 nav a:hover, nav a.active { background: var(--sage); color: var(--green); font-weight: 600; }
 .sidebar-footer { display: flex; gap: 8px; align-items: center; margin-top: auto; color: var(--muted); font-size: 12px; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6da66e; }
+.app-state { display: grid; min-height: 100vh; place-content: center; justify-items: center; gap: 12px; padding: 24px; color: var(--muted); text-align: center; }
+.app-state p { margin: 0; }
+.app-state-error { color: var(--ink); }
+.app-state-error h1 { font-size: clamp(32px, 5vw, 52px); }
+.app-state-error p { max-width: 420px; color: var(--muted); }
+.app-state-error small { max-width: 600px; overflow-wrap: anywhere; color: var(--muted); }
+.app-state-error .primary-button { margin-top: 8px; }
 .main-content { width: min(100%, 1080px); padding: 64px clamp(24px, 7vw, 90px); }
 .page-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
 .eyebrow { margin: 0 0 12px; color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
