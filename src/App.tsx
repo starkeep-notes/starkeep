@@ -6,7 +6,9 @@ import { database } from './db'
 import type { Collection } from './types'
 import { NotesPage } from './NotesPage'
 
-const navigation = [{ label: 'All notes', path: '/' }, { label: 'Collections', path: '/collections' }, { label: 'Web references', path: '/references' }, { label: 'Trash', path: '/trash' }]
+const navigation = [{ label: 'All notes', path: '/' }, { label: 'Collections', path: '/collections' }, { label: 'Web references', path: '/references' }, { label: 'Board', path: '/board' }, { label: 'Trash', path: '/trash' }]
+const themes = ['quiet', 'workspace', 'dark'] as const
+type Theme = typeof themes[number]
 const now = () => Date.now()
 const newId = () => crypto.randomUUID()
 
@@ -22,6 +24,7 @@ function CollectionsPage() {
 }
 function PlaceholderPage({ title, description }: { title: string; description: string }) { return <section className="page"><p className="eyebrow">Notebook</p><h1>{title}</h1><p className="muted">{description}</p></section> }
 function App() {
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('starkeep-theme') as Theme) || 'quiet')
   const [storageState, setStorageState] = useState<'opening' | 'ready' | 'error'>('opening')
   const [storageError, setStorageError] = useState('')
 
@@ -35,6 +38,11 @@ function App() {
   }
 
   useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('starkeep-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
     void database.open().then(() => setStorageState('ready')).catch((error: unknown) => {
       setStorageState('error')
       setStorageError(error instanceof Error ? error.message : 'The browser could not open local storage.')
@@ -44,6 +52,6 @@ function App() {
   if (storageState === 'opening') return <main className="app-state" aria-live="polite"><span className="status-dot" /><p>Opening your local notebook…</p></main>
   if (storageState === 'error') return <main className="app-state app-state-error" role="alert"><span className="empty-icon">!</span><h1>Storage unavailable</h1><p>Starkeep could not open its local notebook. Your existing data has not been changed.</p><small>{storageError}</small><button className="primary-button" type="button" onClick={openDatabase}>Try again</button></main>
 
-  return <HashRouter><div className="app-shell"><aside className="sidebar"><div className="brand"><span className="brand-mark">S</span><span>starkeep</span></div><p className="sidebar-label">Notebook</p><nav aria-label="Primary navigation">{navigation.map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'}>{item.label}</NavLink>)}</nav><div className="sidebar-footer"><span className="status-dot" />Local storage ready</div></aside><main className="main-content"><Routes><Route path="/" element={<NotesPage />} /><Route path="/notes/:noteId" element={<NotesPage />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main></div></HashRouter>
+  return <HashRouter><div className={`app-shell theme-${theme}`}><aside className="sidebar"><div className="brand"><span className="brand-mark">S</span><span>starkeep <small>keep</small></span></div><p className="sidebar-label">Notebook</p><nav aria-label="Primary navigation">{navigation.map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'}>{item.label}</NavLink>)}</nav><div className="theme-switcher" aria-label="Choose visual theme">{themes.map((item) => <button key={item} className={theme === item ? 'selected' : ''} type="button" onClick={() => setTheme(item)}>{item}</button>)}</div><div className="sidebar-footer"><span className="status-dot" />Local storage ready</div></aside><main className="main-content"><Routes><Route path="/" element={<NotesPage />} /><Route path="/notes/:noteId" element={<NotesPage />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main></div></HashRouter>
 }
 export default App
