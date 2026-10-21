@@ -138,6 +138,23 @@ The target deployment is the organization site at `https://starkeep-notes.github
    - Keep a small capture-oriented API boundary so a bookmarklet or extension can later create a note/reference payload.
    - Do not add browser permissions or extension infrastructure to the first release.
 
+## User experience and architectural philosophy
+
+The notebook should feel like a dependable local application, even though its static shell is hosted on GitHub Pages. The following principles guide implementation and future changes:
+
+- **Fast after first load:** Keep the application shell lightweight and defer heavier editor functionality until a note is opened or created. Prefer responsive local reads over unnecessary network requests.
+- **Never hide persistence state:** Make the IndexedDB lifecycle visible through simple loading, ready, saving, saved-locally, and storage-error states. The interface must not imply that data was saved when persistence failed.
+- **Local-first is not automatically offline-first:** Dexie makes note data local, but the initial release does not guarantee that the app shell can be reopened without a network connection. Treat installable offline use as a later PWA milestone.
+- **Offline evolution without a rewrite:** A future service worker and manifest may cache the static shell and editor assets, allowing the existing IndexedDB-backed application to reopen offline. Cache versioning and update recovery must be designed deliberately.
+- **Navigation should feel app-like:** Use hash routing for reliable GitHub Pages refreshes and direct links. Preserve browser back/forward behavior and keep navigation within the SPA without full-page reloads.
+- **Responsive by intent:** Desktop layouts may use a sidebar, while small screens should use compact horizontal, drawer, or bottom navigation. The editor and core actions must remain usable on narrow screens.
+- **Autosave with confidence:** Save edits locally using debounced writes and save on meaningful lifecycle boundaries. Show clear local-save feedback rather than requiring users to manage a manual save step.
+- **Progressive search:** Start with immediate local filtering appropriate for a personal notebook. Introduce indexing or full-text search only when notebook size makes in-memory search insufficient.
+- **Images are data, not decoration:** Validate image size and format early. Begin with a practical document representation, but keep the storage boundary flexible enough to move large image blobs into dedicated IndexedDB records later.
+- **Portability is a product feature:** Browser storage is scoped to the exact origin, so localhost, GitHub Pages, and any future custom domain are separate notebooks. Versioned export/import is therefore a backup and migration path, not an optional extra.
+- **Fail visibly and recoverably:** Storage failures, malformed imports, and unavailable data need actionable error states. Never silently discard edits or present stale data as current.
+- **Stabilize local data before synchronization:** Capture integrations, PWA installation, and multi-device synchronization should build on a stable note/reference payload and import/export format. Synchronization is a later concern involving identity, conflicts, privacy, encryption, and service reliability.
+
 ## Delivery phases
 
 ### Phase 0 — Confirm decisions and scaffold
@@ -199,5 +216,11 @@ The target deployment is the organization site at `https://starkeep-notes.github
 - **Import behavior:** Offer merge or replace each time.
 - **Initial content blocks:** Plain text, headings, bulleted and numbered lists, links, checklists, and images.
 - **Collections:** Nested collections are supported in the first release.
+- **Loading:** Provide explicit application, database, ready, and storage-error states; defer the heavier editor where practical.
+- **Offline:** The first release is local-data-first, but true offline reopening requires a future service worker and installable PWA layer.
+- **Navigation:** Use `HashRouter` for GitHub Pages reliability while preserving SPA navigation and browser history behavior.
+- **Autosave:** Prefer debounced local autosave with visible save status and lifecycle-boundary saves.
+- **Portability:** Treat versioned JSON export/import as required backup and origin-migration infrastructure.
+- **Future direction:** Stabilize local persistence and the note/reference payload boundary before adding capture integrations or synchronization.
 
 These choices expand the initial data model slightly: notes need a deletion timestamp/state, collections need an optional parent collection ID, and the import/export schema must preserve image content and collection hierarchy.
