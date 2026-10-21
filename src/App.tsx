@@ -20,21 +20,31 @@ const preview = (content: string) => { try { return JSON.parse(content).ops?.map
 function NoteEditor({ note, onSaved, onClose }: { note: Note; onSaved: (note: Note) => void; onClose: () => void }) {
   const editorRef = useRef<HTMLDivElement>(null)
   const quillRef = useRef<Quill | null>(null)
+  const titleRef = useRef(note.title)
+  const noteRef = useRef(note)
+  const onSavedRef = useRef(onSaved)
+  const initialContentRef = useRef(note.content)
   const [title, setTitle] = useState(note.title)
   const [saveState, setSaveState] = useState('Saved locally')
+
+  useEffect(() => { titleRef.current = title }, [title])
+  useEffect(() => { noteRef.current = note }, [note])
+  useEffect(() => { onSavedRef.current = onSaved }, [onSaved])
+
   useEffect(() => {
     if (!editorRef.current) return
-    const quill = new Quill(editorRef.current, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{ header: [1, 2, false] }], [{ list: 'ordered' }, { list: 'bullet' }], ['link', 'image']] } })
-    try { quill.setContents(JSON.parse(note.content)) } catch { quill.setText(note.content) }
+    const editorElement = editorRef.current
+    const quill = new Quill(editorElement, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{ header: [1, 2, false] }], [{ list: 'ordered' }, { list: 'bullet' }], ['link', 'image']] } })
+    try { quill.setContents(JSON.parse(initialContentRef.current)) } catch { quill.setText(initialContentRef.current) }
     quillRef.current = quill
     const save = () => {
       setSaveState('Saving…')
-      const updated = { ...note, title: title.trim() || 'Untitled note', content: JSON.stringify(quill.getContents()), updatedAt: now() }
-      void database.notes.put(updated).then(() => { setSaveState('Saved locally'); onSaved(updated) })
+      const updated = { ...noteRef.current, title: titleRef.current.trim() || 'Untitled note', content: JSON.stringify(quill.getContents()), updatedAt: now() }
+      void database.notes.put(updated).then(() => { setSaveState('Saved locally'); onSavedRef.current(updated) })
     }
     quill.on('text-change', save)
-    return () => { quill.off('text-change', save); quillRef.current = null }
-  }, [note.id, note.content, title, note, onSaved])
+    return () => { quill.off('text-change', save); quill.disable(); quillRef.current = null; editorElement.replaceChildren() }
+  }, [note.id])
 
   const saveTitle = () => {
     const updated = { ...note, title: title.trim() || 'Untitled note', content: quillRef.current ? JSON.stringify(quillRef.current.getContents()) : note.content, updatedAt: now() }
