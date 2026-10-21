@@ -4,9 +4,9 @@ import type { Collection, Note } from './types'
 import { database } from './db'
 import { notesRepository } from './notesRepository'
 
-type Props = { note: Note; onSaved: (note: Note) => void; onClose: () => void }
+type Props = { note: Note; onSaved: (note: Note) => void; onClose: () => void; backLabel?: string }
 
-export function NoteEditor({ note, onSaved, onClose }: Props) {
+export function NoteEditor({ note, onSaved, onClose, backLabel = 'All notes' }: Props) {
   const editorRef = useRef<HTMLDivElement>(null)
   const quillRef = useRef<Quill | null>(null)
   const noteRef = useRef(note)
@@ -51,5 +51,5 @@ export function NoteEditor({ note, onSaved, onClose }: Props) {
 
   const saveTitle = () => { if (quillRef.current) persist(quillRef.current) }
 
-  return <div className="editor-panel"><div className="editor-header"><button type="button" className="text-button editor-back" onClick={onClose}>← All notes</button><span className={`save-state ${saveState.startsWith('Save failed') ? 'save-failed' : ''}`}><span className="status-dot" />{saveState}</span></div><input className="title-input" value={title} onChange={(event) => { setTitle(event.target.value); titleRef.current = event.target.value; metadataDirtyRef.current = true; setSaveState('Unsaved changes') }} onBlur={saveTitle} aria-label="Note title" placeholder="Untitled note" />{collections.length > 0 && <label className="editor-collection"><span>Collection</span><select value={collectionId} onChange={(event) => { setCollectionId(event.target.value); collectionIdRef.current = event.target.value; metadataDirtyRef.current = true; setSaveState('Unsaved changes'); if (quillRef.current) persist(quillRef.current) }}><option value="">No collection</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{collection.name}</option>)}</select></label>}<div ref={editorRef} className="quill-editor" /></div>
+  return <div className="editor-panel"><div className="editor-header"><button type="button" className="text-button editor-back" onClick={onClose}>← {backLabel}</button><span className={`save-state ${saveState.startsWith('Save failed') ? 'save-failed' : ''}`}><span className="status-dot" />{saveState}</span></div><input className="title-input" value={title} onChange={(event) => { setTitle(event.target.value); titleRef.current = event.target.value; metadataDirtyRef.current = true; setSaveState('Unsaved changes') }} onBlur={saveTitle} aria-label="Note title" placeholder="Untitled note" />{collections.length > 0 && <label className="editor-collection"><span>Collection</span><select value={collectionId} onChange={(event) => { setCollectionId(event.target.value); collectionIdRef.current = event.target.value; metadataDirtyRef.current = true; setSaveState('Unsaved changes'); if (quillRef.current) persist(quillRef.current) }}><option value="">No collection</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{collection.name}</option>)}</select></label>}<div ref={editorRef} className="quill-editor" /></div>
 }

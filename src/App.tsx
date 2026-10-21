@@ -37,16 +37,19 @@ function PortabilityPage() {
 function NotebookShell({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => void }) {
   const navigate = useNavigate()
   const [newNoteRequest, setNewNoteRequest] = useState(0)
+  const [sidebarExpanded, setSidebarExpanded] = useState(() => localStorage.getItem('starkeep-sidebar-expanded') === 'true')
   const onNewNoteHandled = useCallback(() => setNewNoteRequest(0), [])
-  return <div className={`app-shell theme-${theme}`}>
+  useEffect(() => { localStorage.setItem('starkeep-sidebar-expanded', String(sidebarExpanded)) }, [sidebarExpanded])
+  return <div className={`app-shell theme-${theme} ${sidebarExpanded ? 'sidebar-expanded' : ''}`}>
     <aside className="sidebar">
       <div className="brand" aria-label="Starkeep"><span className="brand-mark">✦</span><span className="brand-name">starkeep</span></div>
+      <button className="sidebar-toggle" type="button" aria-label={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'} aria-expanded={sidebarExpanded} title={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'} onClick={() => setSidebarExpanded((value) => !value)}><span aria-hidden="true">{sidebarExpanded ? '«' : '»'}</span><span className="toggle-label">{sidebarExpanded ? 'Collapse' : 'Expand'}</span></button>
       <button className="rail-new" type="button" aria-label="New note" title="New note" onClick={() => { navigate('/'); setNewNoteRequest((value) => value + 1) }}>＋</button>
       <nav aria-label="Primary navigation">{navigation.map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'} aria-label={item.label} title={item.label} className={({ isActive }) => isActive ? 'active' : ''}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span className="nav-label">{item.label}</span></NavLink>)}</nav>
       <label className="theme-switcher"><span className="theme-icon" aria-hidden="true">◐</span><span className="theme-label">Theme</span><select aria-label="Choose visual theme" value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>{themes.map((item) => <option key={item} value={item}>{themeLabels[item]}</option>)}</select></label>
       <div className="sidebar-footer"><span className="status-dot" /> <span>Saved on this device</span></div>
     </aside>
-    <main className="main-content"><Routes><Route path="/" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/notes/:noteId" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/backup" element={<PortabilityPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main>
+    <main className="main-content"><Routes><Route path="/" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/notes/:noteId" element={<NotesPage newNoteRequest={newNoteRequest} onNewNoteHandled={onNewNoteHandled} />} /><Route path="/collections" element={<CollectionsPage />} /><Route path="/backup" element={<PortabilityPage />} /><Route path="/references" element={<PlaceholderPage title="Web references" description="Browse notes that connect back to pages across the web." />} /><Route path="/board" element={<NotesPage board />} /><Route path="/board/notes/:noteId" element={<NotesPage board />} /><Route path="/trash" element={<NotesPage showTrash />} /><Route path="/trash/notes/:noteId" element={<NotesPage showTrash />} /></Routes></main>
   </div>
 }
 function App() {
