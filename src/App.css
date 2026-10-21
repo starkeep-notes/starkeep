@@ -46,6 +46,7 @@ h2 { margin: 16px 0 8px; font-size: 25px; letter-spacing: -.04em; }
 .editor-panel { max-width: 800px; margin: 0 auto; }
 .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
 .save-state { color: var(--muted); font-size: 13px; }
+.save-failed { color: #a14d42; font-weight: 600; }
 .title-input { width: 100%; border: 0; border-bottom: 1px solid var(--line); padding: 0 0 12px; background: transparent; color: var(--ink); font-size: 38px; font-weight: 700; outline: none; }
 .quill-editor { margin-top: 30px; background: white; }
 .quill-editor .ql-editor { min-height: 360px; font-size: 17px; line-height: 1.7; }

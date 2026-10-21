@@ -1,7 +1,11 @@
+import type Delta from 'quill-delta'
+
+export type NoteContent = Delta
+
 export type Note = {
   id: string
   title: string
-  content: string
+  content: NoteContent
   collectionId?: string
   createdAt: number
   updatedAt: number
