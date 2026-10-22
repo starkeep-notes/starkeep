@@ -29,9 +29,9 @@ export function createTemplateValues(notes: Note[] = []): Record<string, string>
   const collections = new Set(activeNotes.map((note) => note.collectionId).filter(Boolean))
   const widgets = notes.filter((note) => !note.deletedAt && note.isWidget).length
   return {
-    'notes.total': String(notes.filter((note) => !note.deletedAt && !note.isWidget).length),
-    'notes.created_today': String(notes.filter((note) => !note.deletedAt && note.createdAt >= startOfToday.getTime()).length),
-    'notes.updated_week': String(notes.filter((note) => !note.deletedAt && note.updatedAt >= weekAgo).length),
+    'notes.total': String(activeNotes.length),
+    'notes.created_today': String(activeNotes.filter((note) => note.createdAt >= startOfToday.getTime()).length),
+    'notes.updated_week': String(activeNotes.filter((note) => note.updatedAt >= weekAgo).length),
     'notes.words': words.toLocaleString(),
     'notes.collections': String(collections.size),
     'notes.widgets': String(widgets),
