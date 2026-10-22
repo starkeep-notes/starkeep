@@ -10,7 +10,9 @@ export type Note = {
   isWidget?: boolean
   widgetStyle?: 'cream' | 'yellow' | 'blue' | 'green' | 'ink'
   widgetPinned?: boolean
-  widgetSize?: 'small' | 'wide'
+  widgetHidden?: boolean
+  widgetOrder?: number
+  widgetSize?: 'small' | 'medium' | 'large' | 'wide'
   createdAt: number
   updatedAt: number
   deletedAt?: number
