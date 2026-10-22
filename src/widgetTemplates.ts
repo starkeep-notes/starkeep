@@ -1,3 +1,5 @@
+import type { Note } from './types'
+
 export type WidgetStyle = 'cream' | 'yellow' | 'blue' | 'green' | 'ink'
 
 export type WidgetTemplate = {
@@ -18,11 +20,21 @@ export const widgetPresets: WidgetTemplate[] = [
   { id: 'custom', name: 'Custom text', category: 'Custom', description: 'Start with a blank canvas.', template: 'Your idea starts here.', accent: 'ink' },
 ]
 
-export const templateValues: Record<string, string> = {
-  'notes.total': '248', 'notes.created_today': '12', 'notes.updated_week': '36', 'notes.words': '18,420',
-  'date.today': new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-  'date.greeting': new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening',
+export function createTemplateValues(notes: Note[] = []): Record<string, string> {
+  const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0)
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+  const words = notes.reduce((total, note) => total + note.content.ops.reduce((count, op) => count + (typeof op.insert === 'string' ? op.insert.trim().split(/\\s+/).filter(Boolean).length : 0), 0), 0)
+  return {
+    'notes.total': String(notes.filter((note) => !note.deletedAt && !note.isWidget).length),
+    'notes.created_today': String(notes.filter((note) => !note.deletedAt && note.createdAt >= startOfToday.getTime()).length),
+    'notes.updated_week': String(notes.filter((note) => !note.deletedAt && note.updatedAt >= weekAgo).length),
+    'notes.words': words.toLocaleString(),
+    'date.today': new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+    'date.greeting': new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening',
+  }
 }
+
+export const templateValues = createTemplateValues()
 
 export function renderWidgetTemplate(template: string, values = templateValues) {
   return template.replace(/{{\s*([\w.]+)(?:\s*\|[^}]+)?\s*}}/g, (_, key: string) => values[key] ?? `{{${key}}}`)

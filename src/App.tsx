@@ -5,10 +5,11 @@ import './App.css'
 import './Notebook.css'
 import './Widgets.css'
 import { database } from './db'
-import type { Collection } from './types'
+import type { Collection, Note } from './types'
 import { NotesPage } from './NotesPage'
 import { exportBackup, importBackup } from './portability'
-import { loadSavedTemplates, renderWidgetTemplate, templateValues, widgetPresets, type WidgetStyle } from './widgetTemplates'
+import { notesRepository } from './notesRepository'
+import { loadSavedTemplates, renderWidgetTemplate, createTemplateValues, widgetPresets, type WidgetStyle } from './widgetTemplates'
 
 const navigation = [{ label: 'Board', path: '/', icon: '▤' }, { label: 'All notes', path: '/notes', icon: '☰' }, { label: 'Widgets', path: '/widgets', icon: '✦' }, { label: 'Collections', path: '/collections', icon: '▦' }, { label: 'Web references', path: '/references', icon: '↗' }, { label: 'Trash', path: '/trash', icon: '♻' }, { label: 'Backup & recovery', path: '/backup', icon: '⇅' }]
 const themes = ['sticker', 'quiet', 'dark'] as const
@@ -47,8 +48,10 @@ function WidgetsPage() {
   const [style, setStyle] = useState<WidgetStyle>('cream')
   const [savedTemplates, setSavedTemplates] = useState(() => loadSavedTemplates())
   const [saved, setSaved] = useState(false)
+  const [notes, setNotes] = useState<Note[]>([])
+  useEffect(() => { void notesRepository.list().then(setNotes) }, [])
   useEffect(() => { const stored = loadSavedTemplates(); setSavedTemplates(stored); const existing = stored.find((item) => item.id === widgetId); if (existing) { setTemplate(existing.template); setStyle(existing.accent); setSelectedId(widgetPresets.some((preset) => preset.name === existing.name) ? widgetPresets.find((preset) => preset.name === existing.name)?.id ?? 'custom' : 'custom') } }, [widgetId])
-  const values = templateValues
+  const values = createTemplateValues(notes)
   const choosePreset = (preset: typeof widgetPresets[number]) => { setWidgetId(crypto.randomUUID()); setSelectedId(preset.id); setTemplate(preset.id === 'quote' ? '“The secret of getting ahead is getting started.”\n\n— Mark Twain\n\nQuote of the day' : preset.id === 'counter' ? '# {{notes.total}}\n\nIdeas collected\n\n↑ {{notes.created_today}} this week' : preset.id === 'welcome' ? '# Hello, {{date.greeting}}\n\nYou have **{{notes.total}} notes** in your notebook.' : preset.id === 'goal' ? '## Daily goal\n\n{{notes.updated_week}} notes updated\n\n62% of 400 goal' : 'Your idea starts here.'); setStyle(preset.accent as typeof style); setSaved(false) }
   const insertVariable = (key: string) => { setTemplate((current) => `${current}{{${key}}}`); setSaved(false) }
   return <section className="widgets-page">
