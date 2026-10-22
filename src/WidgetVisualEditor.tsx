@@ -9,6 +9,21 @@ import { documentToTiptap, tiptapToDocument } from './widgetDocumentAdapter'
 const tokenSource = (key: string) => `{{${key}}}`
 
 type TokenViewProps = Pick<ReactNodeViewProps, 'node' | 'updateAttributes'>
+type BlockViewProps = Pick<ReactNodeViewProps, 'node' | 'updateAttributes'>
+function WidgetMetricView({ node, updateAttributes }: BlockViewProps) {
+  const label = String(node.attrs.label ?? '')
+  const value = String(node.attrs.value ?? '')
+  return <NodeViewWrapper className="widget-block-node" contentEditable={false}><label>Metric label<input aria-label="Metric label" value={label} onChange={(event) => updateAttributes({ label: event.target.value, source: `[metric: ${event.target.value} | ${value}]` })} /></label><label>Value<input aria-label="Metric value" value={value} onChange={(event) => updateAttributes({ value: event.target.value, source: `[metric: ${label} | ${event.target.value}]` })} /></label></NodeViewWrapper>
+}
+function WidgetProgressView({ node, updateAttributes }: BlockViewProps) {
+  const label = String(node.attrs.label ?? '')
+  const value = String(node.attrs.value ?? '')
+  const maximum = String(node.attrs.maximum ?? '100')
+  return <NodeViewWrapper className="widget-block-node" contentEditable={false}><label>Progress label<input aria-label="Progress label" value={label} onChange={(event) => updateAttributes({ label: event.target.value, source: `[progress: ${event.target.value} | ${value} | ${maximum}]` })} /></label><label>Value<input aria-label="Progress value" value={value} onChange={(event) => updateAttributes({ value: event.target.value, source: `[progress: ${label} | ${event.target.value} | ${maximum}]` })} /></label><label>Maximum<input aria-label="Progress maximum" value={maximum} onChange={(event) => updateAttributes({ maximum: event.target.value, source: `[progress: ${label} | ${value} | ${event.target.value}]` })} /></label></NodeViewWrapper>
+}
+
+const WidgetMetric = Node.create({ name: 'widgetMetric', group: 'block', atom: true, selectable: true, addAttributes: () => ({ label: { default: 'Metric' }, value: { default: '0' }, source: { default: '' } }), parseHTML: () => [{ tag: 'div[data-widget-metric]' }], renderHTML: ({ HTMLAttributes }) => ['div', mergeAttributes(HTMLAttributes, { 'data-widget-metric': '' })], addNodeView: () => ReactNodeViewRenderer(WidgetMetricView) })
+const WidgetProgress = Node.create({ name: 'widgetProgress', group: 'block', atom: true, selectable: true, addAttributes: () => ({ label: { default: 'Progress' }, value: { default: '0' }, maximum: { default: '100' }, source: { default: '' } }), parseHTML: () => [{ tag: 'div[data-widget-progress]' }], renderHTML: ({ HTMLAttributes }) => ['div', mergeAttributes(HTMLAttributes, { 'data-widget-progress': '' })], addNodeView: () => ReactNodeViewRenderer(WidgetProgressView) })
 function WidgetTokenView({ node, updateAttributes }: TokenViewProps) {
   const key = String(node.attrs.key ?? '')
   const source = String(node.attrs.source ?? '')
@@ -36,13 +51,13 @@ const WidgetToken = Node.create({
   addNodeView: () => ReactNodeViewRenderer(WidgetTokenView),
 })
 
-export type WidgetVisualEditorHandle = { setValue: (value: string) => void; insertToken: (key: string) => void }
+export type WidgetVisualEditorHandle = { setValue: (value: string) => void; insertToken: (key: string) => void; insertBlock: (type: 'heading' | 'metric' | 'progress') => void }
 type Props = { value: string; onChange: (value: string) => void }
 
 export const WidgetVisualEditor = forwardRef<WidgetVisualEditorHandle, Props>(function WidgetVisualEditor({ value, onChange }, ref) {
   const valueRef = useRef(value)
-  const editor = useEditor({ extensions: [StarterKit.configure({ heading: false, bulletList: false, orderedList: false, blockquote: false, codeBlock: false, horizontalRule: false }), WidgetToken], content: documentToTiptap(parseWidgetDocument(value)), onUpdate: ({ editor: current }) => { const next = serializeWidgetDocument(tiptapToDocument(current.getJSON())); valueRef.current = next; onChange(next) }, editorProps: { attributes: { class: 'widget-tiptap-content', 'aria-label': 'Your text' } } })
+  const editor = useEditor({ extensions: [StarterKit.configure({ bulletList: false, orderedList: false, blockquote: false, codeBlock: false, horizontalRule: false }), WidgetToken, WidgetMetric, WidgetProgress], content: documentToTiptap(parseWidgetDocument(value)), onUpdate: ({ editor: current }) => { const next = serializeWidgetDocument(tiptapToDocument(current.getJSON())); valueRef.current = next; onChange(next) }, editorProps: { attributes: { class: 'widget-tiptap-content', 'aria-label': 'Your text' } } })
   useEffect(() => { if (editor && value !== valueRef.current) { valueRef.current = value; editor.commands.setContent(documentToTiptap(parseWidgetDocument(value))) } }, [editor, value])
-  useImperativeHandle(ref, () => ({ setValue: (next) => { valueRef.current = next; editor?.commands.setContent(documentToTiptap(parseWidgetDocument(next))) }, insertToken: (key) => { if (!editor) return; editor.chain().focus().insertContent({ type: 'widgetToken', attrs: { key, source: tokenSource(key) } }).run() } }), [editor])
+  useImperativeHandle(ref, () => ({ setValue: (next) => { valueRef.current = next; editor?.commands.setContent(documentToTiptap(parseWidgetDocument(next))) }, insertToken: (key) => { if (!editor) return; editor.chain().focus().insertContent({ type: 'widgetToken', attrs: { key, source: tokenSource(key) } }).run() }, insertBlock: (type) => { if (!editor) return; const content = type === 'heading' ? { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'New heading' }] } : type === 'metric' ? { type: 'widgetMetric', attrs: { label: 'Metric', value: '0', source: '[metric: Metric | 0]' } } : { type: 'widgetProgress', attrs: { label: 'Progress', value: '0', maximum: '100', source: '[progress: Progress | 0 | 100]' } }; editor.chain().focus().insertContent(content).run() } }), [editor])
   return <div className="builder-text"><EditorContent editor={editor} /></div>
 })

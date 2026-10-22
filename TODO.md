@@ -6,3 +6,6 @@
 - [ ] Refine the syntax editor with line-oriented presentation, validation status, preview, and cheat sheet.
 - [ ] Document the reference visual language and verify responsive, local-first, and GitHub Pages behavior.
 - [x] Add persisted flexible dashboard editing: drag ordering, visibility, duplication, and small/medium/large widget sizing.
+- [x] Add structured widget blocks: headings, metrics, progress bars, and inline dynamic values.
+- [ ] Add widget block reordering, duplication, and deletion controls.
+- [ ] Add callout, divider, list, and chart blocks with block-level validation.

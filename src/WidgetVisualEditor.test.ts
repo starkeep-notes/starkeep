@@ -9,4 +9,9 @@ describe('Tiptap widget document adapter', () => {
     expect(json.content?.[0]?.content?.[1]).toMatchObject({ type: 'widgetToken', attrs: { key: 'notes.total', source: '{{ notes.total }}' } })
     expect(serializeWidgetDocument(tiptapToDocument(json as { content: Array<{ type: string; content: Array<{ type: string; text?: string; attrs?: { key?: string; source?: string } }> }> }))).toBe('Hello {{ notes.total }}\nToday')
   })
+
+  it('omits empty text nodes while preserving empty paragraphs', () => {
+    const json = documentToTiptap(parseWidgetDocument(''))
+    expect(json.content).toEqual([{ type: 'paragraph', content: [] }])
+  })
 })

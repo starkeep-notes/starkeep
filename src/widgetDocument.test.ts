@@ -22,6 +22,13 @@ describe('structured widget documents', () => {
     expect(serializeWidgetDocument(mergeWidgetBlocks(split, 0, 1))).toBe('Hello world')
   })
 
+  it('round-trips headings, metrics, and progress blocks', () => {
+    const source = '# Overview\n[metric: Notes | {{notes.total}}]\n[progress: Goal | 62 | 100]'
+    const document = parseWidgetDocument(source)
+    expect(document.blocks.map((block) => block.type)).toEqual(['heading', 'metric', 'progress'])
+    expect(serializeWidgetDocument(document)).toBe(source)
+  })
+
   it('updates text and inserts a token in the selected block', () => {
     let document = parseWidgetDocument('Draft\nSecond')
     document = updateTextPart(document, 1, 0, 'Updated')
