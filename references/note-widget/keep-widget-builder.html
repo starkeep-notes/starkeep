@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>keep — Widget builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,select{font-family:Inter,sans-serif}
+</style>
+<style>html{background:#e9e5d8}body{display:flex;justify-content:center}</style>
+</head>
+<body>
+<div style="width: 1280px; height: 800px; display: flex; flex-direction: column; background: #fffdf7; color: #1f2430; font-family: Inter, sans-serif; overflow: hidden">
+<div style="height: 72px; box-sizing: border-box; padding: 0 32px; display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #1f2430; background: #fff4c2">
+<button style="height: 40px; padding: 0 14px; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; font-size: 14px; color: #1f2430; cursor: pointer">← Dashboard</button>
+<div style="font-family: Caveat, cursive; font-size: 36px; font-weight: 600">New widget</div>
+<div style="flex: 1"></div>
+<button style="height: 40px; padding: 0 16px; border: 2px solid #1f2430; border-radius: 12px; background: #1f2430; font-size: 14px; font-weight: 600; color: #ffd84d; cursor: pointer">&lt;/&gt; Switch to syntax editor</button>
+<button style="height: 40px; padding: 0 18px; border: 2px solid #1f2430; border-radius: 12px; background: #ffd84d; box-shadow: 3px 3px 0 #1f2430; font-size: 14px; font-weight: 600; color: #1f2430; cursor: pointer">Save widget</button>
+</div>
+<div style="flex: 1; display: flex; min-height: 0">
+<div style="width: 300px; box-sizing: border-box; border-right: 2px solid #1f2430; padding: 24px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-family: Caveat, cursive; font-size: 30px; font-weight: 600">1. Pick a template</div>
+<div style="background: #ffd84d; border: 2px solid #1f2430; border-radius: 14px; box-shadow: 4px 4px 0 #1f2430; padding: 12px 14px"><div style="font-weight: 600; font-size: 15px">Checklist progress</div><div style="font-size: 13px; margin-top: 2px">“1 of 3 done” with a bar</div></div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 14px; padding: 12px 14px"><div style="font-weight: 600; font-size: 15px">Counter</div><div style="font-size: 13px; margin-top: 2px; color: #4a4f5c">A big number, like notes tagged travel</div></div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 14px; padding: 12px 14px"><div style="font-weight: 600; font-size: 15px">Latest note</div><div style="font-size: 13px; margin-top: 2px; color: #4a4f5c">Title and first lines</div></div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 14px; padding: 12px 14px"><div style="font-weight: 600; font-size: 15px">Greeting</div><div style="font-size: 13px; margin-top: 2px; color: #4a4f5c">Friendly summary of your day</div></div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 14px; padding: 12px 14px"><div style="font-weight: 600; font-size: 15px">Blank text</div><div style="font-size: 13px; margin-top: 2px; color: #4a4f5c">Write your own sentence</div></div>
+</div>
+<div style="flex: 1; box-sizing: border-box; padding: 24px 36px; display: flex; flex-direction: column; gap: 16px">
+<div style="font-family: Caveat, cursive; font-size: 30px; font-weight: 600">2. Customize</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Widget title<input value="Trip progress" style="height: 44px; box-sizing: border-box; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; padding: 0 14px; font-family: Inter, sans-serif; font-size: 15px; color: #1f2430" /></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Which note?<select style="height: 44px; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; padding: 0 12px; font-size: 15px; color: #1f2430"><option>Trip ideas</option><option>Weekly groceries</option></select></label>
+<div style="display: flex; flex-direction: column; gap: 8px"><div style="font-size: 13px; font-weight: 600">Your text</div>
+<div style="border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; padding: 14px; font-size: 17px; line-height: 2">
+<span style="background: #ffd84d; border: 2px solid #1f2430; border-radius: 8px; padding: 2px 8px; font-weight: 600">done</span> of <span style="background: #ffd84d; border: 2px solid #1f2430; border-radius: 8px; padding: 2px 8px; font-weight: 600">total</span> done on <span style="background: #ffd84d; border: 2px solid #1f2430; border-radius: 8px; padding: 2px 8px; font-weight: 600">note title</span></div>
+<div style="font-size: 12px; color: #5d6270">Tap a value to add it to your text:</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button style="border: 2px solid #1f2430; border-radius: 999px; background: #fff4c2; padding: 4px 12px; font-size: 13px; color: #1f2430; cursor: pointer">+ edited date</button><button style="border: 2px solid #1f2430; border-radius: 999px; background: #fff4c2; padding: 4px 12px; font-size: 13px; color: #1f2430; cursor: pointer">+ next to-do</button><button style="border: 2px solid #1f2430; border-radius: 999px; background: #fff4c2; padding: 4px 12px; font-size: 13px; color: #1f2430; cursor: pointer">+ tag count</button></div></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><div style="font-size: 13px; font-weight: 600">Size</div><div style="display: flex; gap: 8px"><button style="width: 64px; height: 40px; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; font-size: 14px; color: #1f2430; cursor: pointer">Small</button><button style="width: 80px; height: 40px; border: 2px solid #1f2430; border-radius: 12px; background: #ffd84d; box-shadow: 3px 3px 0 #1f2430; font-size: 14px; font-weight: 600; color: #1f2430; cursor: pointer">Medium</button><button style="width: 64px; height: 40px; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; font-size: 14px; color: #1f2430; cursor: pointer">Large</button></div></div>
+</div>
+<div style="width: 360px; box-sizing: border-box; border-left: 2px solid #1f2430; background: #fff4c2; padding: 24px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-family: Caveat, cursive; font-size: 30px; font-weight: 600">Live preview</div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 20px; box-shadow: 5px 5px 0 #1f2430; padding: 20px"><div style="font-family: Caveat, cursive; font-size: 30px; font-weight: 600; line-height: 1">Trip progress</div><div style="font-size: 18px; margin-top: 12px"><b>1 of 3</b> done on Trip ideas</div><div style="height: 20px; border: 2px solid #1f2430; border-radius: 999px; margin-top: 14px; overflow: hidden"><div style="width: 33%; height: 100%; background: #ffd84d; border-right: 2px solid #1f2430"></div></div></div>
+<div style="font-size: 13px; line-height: 1.5; color: #4a4f5c">The widget updates by itself whenever you tick items in Trip ideas. Want more control? Switch to the syntax editor to write your own.</div>
+</div>
+</div>
+</div>
+</body>
+</html>

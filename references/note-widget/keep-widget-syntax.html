@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>keep — Widget syntax editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:Inter,sans-serif}
+</style>
+<style>html{background:#e9e5d8}body{display:flex;justify-content:center}</style>
+</head>
+<body>
+<div style="width: 1280px; height: 800px; display: flex; flex-direction: column; background: #fffdf7; color: #1f2430; font-family: Inter, sans-serif; overflow: hidden">
+<div style="height: 72px; box-sizing: border-box; padding: 0 32px; display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #1f2430; background: #fff4c2">
+<button style="height: 40px; padding: 0 14px; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; font-size: 14px; color: #1f2430; cursor: pointer">← Dashboard</button>
+<div style="font-family: Caveat, cursive; font-size: 36px; font-weight: 600">Trip progress</div>
+<span style="font-size: 12px; font-weight: 600; border: 2px solid #1f2430; border-radius: 999px; padding: 2px 10px; background: #1f2430; color: #ffd84d; font-family: ui-monospace, Menlo, monospace">syntax</span>
+<div style="flex: 1"></div>
+<span style="font-size: 13px; font-weight: 600; border: 2px solid #1f2430; border-radius: 999px; padding: 4px 12px; background: #ffffff">✓ No errors</span>
+<button style="height: 40px; padding: 0 16px; border: 2px solid #1f2430; border-radius: 12px; background: #ffffff; font-size: 14px; color: #1f2430; cursor: pointer">Back to templates</button>
+<button style="height: 40px; padding: 0 18px; border: 2px solid #1f2430; border-radius: 12px; background: #ffd84d; box-shadow: 3px 3px 0 #1f2430; font-size: 14px; font-weight: 600; color: #1f2430; cursor: pointer">Save widget</button>
+</div>
+<div style="flex: 1; display: flex; min-height: 0">
+<div style="flex: 1; position: relative; background: #1f2430; color: #f4efe2; padding: 28px 0; font-family: ui-monospace, Menlo, monospace; font-size: 16px; line-height: 2.1">
+<div style="display: flex"><div style="width: 56px; text-align: right; padding-right: 18px; color: #8b93a5">1</div><div>Trip progress</div></div>
+<div style="display: flex"><div style="width: 56px; text-align: right; padding-right: 18px; color: #8b93a5">2</div><div><span style="color: #a9b0bf">{{</span> <span style="color: #ffd84d">checklist</span>(<span style="color: #e8a900">"Trip ideas"</span>).done <span style="color: #a9b0bf">}}</span> of <span style="color: #a9b0bf">{{</span> <span style="color: #ffd84d">checklist</span>(<span style="color: #e8a900">"Trip ideas"</span>).total <span style="color: #a9b0bf">}}</span> done</div></div>
+<div style="display: flex"><div style="width: 56px; text-align: right; padding-right: 18px; color: #8b93a5">3</div><div><span style="color: #a9b0bf">{{</span> <span style="color: #ffd84d">count</span>(notes <span style="color: #ffd84d">where</span> tag = <span style="color: #e8a900">"travel"</span>) <span style="color: #a9b0bf">}}</span> travel notes</div></div>
+<div style="display: flex"><div style="width: 56px; text-align: right; padding-right: 18px; color: #8b93a5">4</div><div>Last edited <span style="color: #a9b0bf">{{</span> <span style="color: #ffd84d">note</span>(<span style="color: #e8a900">"Trip ideas"</span>).edited | <span style="color: #ffd84d">ago</span> <span style="color: #a9b0bf">}}</span></div></div>
+<div style="display: flex"><div style="width: 56px; text-align: right; padding-right: 18px; color: #8b93a5">5</div><div><span style="color: #a9b0bf">{{</span> <span style="background: #3b445a">ch</span><span style="border-left: 2px solid #ffd84d"></span></div></div>
+<div style="position: absolute; left: 100px; top: 232px; width: 400px; background: #ffffff; color: #1f2430; border: 2px solid #1f2430; border-radius: 14px; box-shadow: 4px 4px 0 #ffd84d; padding: 6px; font-family: Inter, sans-serif; font-size: 14px; line-height: 1.4">
+<div style="background: #ffd84d; border-radius: 9px; padding: 8px 10px"><b style="font-family: ui-monospace, Menlo, monospace">checklist</b>(note)<div style="font-size: 12px">done, total, items, next</div></div>
+<div style="padding: 8px 10px"><b style="font-family: ui-monospace, Menlo, monospace">checked</b>(note)<div style="font-size: 12px; color: #5d6270">list of ticked items</div></div>
+</div>
+</div>
+<div style="width: 400px; box-sizing: border-box; border-left: 2px solid #1f2430; background: #fff4c2; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-family: Caveat, cursive; font-size: 30px; font-weight: 600">Live preview</div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 20px; box-shadow: 5px 5px 0 #1f2430; padding: 20px"><div style="font-family: Caveat, cursive; font-size: 30px; font-weight: 600; line-height: 1">Trip progress</div><div style="font-size: 17px; line-height: 1.7; margin-top: 10px"><b>1</b> of <b>3</b> done<br><b>4</b> travel notes<br>Last edited <b>3 hours ago</b></div></div>
+<div style="font-family: Caveat, cursive; font-size: 26px; font-weight: 600; margin-top: 6px">Cheat sheet</div>
+<div style="background: #ffffff; border: 2px solid #1f2430; border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.7"><code style="font-family: ui-monospace, Menlo, monospace">{{ note("title") }}</code> one note<br><code style="font-family: ui-monospace, Menlo, monospace">{{ notes where tag = "x" }}</code> filter<br><code style="font-family: ui-monospace, Menlo, monospace">{{ value | ago }}</code> format a value</div>
+</div>
+</div>
+</div>
+</body>
+</html>
