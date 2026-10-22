@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { HashRouter, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
+import { HashRouter, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import 'quill/dist/quill.snow.css'
 import './App.css'
 import './Notebook.css'
@@ -91,6 +91,7 @@ function WidgetsPage() {
 
 function NotebookShell({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => void }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const [newNoteRequest, setNewNoteRequest] = useState(0)
   const [sidebarExpanded, setSidebarExpanded] = useState(() => localStorage.getItem('starkeep-sidebar-expanded') === 'true')
   const onNewNoteHandled = useCallback(() => setNewNoteRequest(0), [])
@@ -101,7 +102,8 @@ function NotebookShell({ theme, setTheme }: { theme: Theme; setTheme: (theme: Th
       <button className="sidebar-toggle" type="button" aria-label={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'} aria-expanded={sidebarExpanded} title={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'} onClick={() => setSidebarExpanded((value) => !value)}><span aria-hidden="true">{sidebarExpanded ? '«' : '»'}</span><span className="toggle-label">{sidebarExpanded ? 'Collapse' : 'Expand'}</span></button>
       <button className="rail-new" type="button" aria-label="New note" title="New note" onClick={() => { navigate('/notes'); setNewNoteRequest((value) => value + 1) }}>＋</button>
       <button className="rail-widget" type="button" aria-label="Add widget" title="Add widget" onClick={() => navigate('/widgets')}>✦</button>
-      <nav aria-label="Primary navigation">{navigation.map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'} aria-label={item.label} title={item.label} className={({ isActive }) => isActive ? 'active' : ''}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span className="nav-label">{item.label}</span></NavLink>)}</nav>
+      <nav className="sidebar-nav-primary" aria-label="Primary navigation">{navigation.slice(0, 4).map((item) => <NavLink key={item.path} to={item.path} end={item.path === '/'} aria-label={item.label} title={item.label} className={({ isActive }) => isActive || (item.path === '/' && location.pathname === '/board') ? 'active' : ''}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span className="nav-label">{item.label}</span></NavLink>)}</nav>
+      <nav className="sidebar-nav-secondary" aria-label="Utility navigation">{navigation.slice(4).map((item) => <NavLink key={item.path} to={item.path} end aria-label={item.label} title={item.label} className={({ isActive }) => isActive ? 'active' : ''}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span className="nav-label">{item.label}</span></NavLink>)}</nav>
       <label className="theme-switcher"><span className="theme-icon" aria-hidden="true">◐</span><span className="theme-label">Theme</span><select aria-label="Choose visual theme" value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>{themes.map((item) => <option key={item} value={item}>{themeLabels[item]}</option>)}</select></label>
       <div className="sidebar-footer"><span className="status-dot" /> <span>Saved on this device</span></div>
     </aside>

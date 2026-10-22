@@ -67,8 +67,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .rail-new, .rail-widget, .sidebar nav a { width: 48px; height: 48px; display: grid; place-items: center; padding: 0; border: 2px solid transparent; border-radius: 14px; background: transparent; color: var(--ink); font-size: 24px; text-decoration: none; }
 .rail-new { border-color: var(--ink); background: var(--accent); box-shadow: 3px 3px 0 var(--ink); font-size: 30px; line-height: 1; }
 .sidebar nav { display: grid; justify-items: center; gap: 7px; width: 100%; margin: 0; }
+.sidebar-nav-secondary { margin-top: auto !important; padding-top: 10px; border-top: 1px solid var(--line); }
+.sidebar nav a { position: relative; }
 .sidebar nav a:hover, .sidebar nav a.active { border-color: var(--ink); background: var(--surface); color: var(--ink); font-weight: 500; }
 .sidebar nav a.active { box-shadow: 2px 2px 0 var(--ink); }
+.sidebar nav a.active::before { content: ''; position: absolute; left: -2px; width: 4px; height: 22px; border-radius: 0 4px 4px 0; background: var(--accent); }
 .nav-icon { font-size: 24px; line-height: 1; }
 .theme-switcher { display: grid; justify-items: center; gap: 3px; width: 100%; margin-top: auto; padding: 0 4px; color: var(--ink); }
 .theme-icon { font-size: 22px; }
@@ -134,7 +137,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="dark"] .primary-button { border-color: var(--accent); }
 .app-shell { transition: grid-template-columns 220ms ease; }
 .app-shell.sidebar-expanded { grid-template-columns: 226px minmax(0, 1fr); }
-.sidebar { overflow: hidden; transition: background-color 220ms ease; }
+.sidebar { overflow-x: hidden; overflow-y: auto; transition: background-color 220ms ease; scrollbar-width: thin; }
 .sidebar-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; width: 48px; min-height: 32px; padding: 4px; border: var(--border-width) solid transparent; border-radius: 9px; background: transparent; color: var(--muted); font-size: 17px; }
 .sidebar-toggle:hover { background: var(--surface); color: var(--ink); }
 .toggle-label { display: none; font-size: 12px; }
@@ -207,6 +210,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .brand-mark { width: 38px; height: 36px; font-size: 36px; }
   .rail-new, .sidebar nav a { width: 40px; height: 40px; font-size: 22px; }
   .sidebar nav { display: flex; width: auto; gap: 2px; overflow-x: auto; }
+  .sidebar-nav-secondary { margin-top: 0 !important; padding-top: 0; border-top: 0; }
   .nav-icon { font-size: 20px; }
   .theme-switcher { width: auto; margin: 0 0 0 auto; padding: 0; }
   .theme-icon, .theme-label, .sidebar-footer { display: none; }
