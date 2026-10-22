@@ -23,12 +23,20 @@ export const widgetPresets: WidgetTemplate[] = [
 export function createTemplateValues(notes: Note[] = []): Record<string, string> {
   const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0)
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
-  const words = notes.reduce((total, note) => total + note.content.ops.reduce((count, op) => count + (typeof op.insert === 'string' ? op.insert.trim().split(/\\s+/).filter(Boolean).length : 0), 0), 0)
+  const activeNotes = notes.filter((note) => !note.deletedAt && !note.isWidget)
+  const words = activeNotes.reduce((total, note) => total + note.content.ops.reduce((count, op) => count + (typeof op.insert === 'string' ? op.insert.trim().split(/\s+/).filter(Boolean).length : 0), 0), 0)
+  const latest = activeNotes.sort((a, b) => b.updatedAt - a.updatedAt)[0]
+  const collections = new Set(activeNotes.map((note) => note.collectionId).filter(Boolean))
+  const widgets = notes.filter((note) => !note.deletedAt && note.isWidget).length
   return {
     'notes.total': String(notes.filter((note) => !note.deletedAt && !note.isWidget).length),
     'notes.created_today': String(notes.filter((note) => !note.deletedAt && note.createdAt >= startOfToday.getTime()).length),
     'notes.updated_week': String(notes.filter((note) => !note.deletedAt && note.updatedAt >= weekAgo).length),
     'notes.words': words.toLocaleString(),
+    'notes.collections': String(collections.size),
+    'notes.widgets': String(widgets),
+    'notes.latest_title': latest?.title ?? 'No notes yet',
+    'notes.latest_date': latest ? new Date(latest.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '—',
     'date.today': new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
     'date.greeting': new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening',
   }

@@ -9,6 +9,8 @@ export type Note = {
   collectionId?: string
   isWidget?: boolean
   widgetStyle?: 'cream' | 'yellow' | 'blue' | 'green' | 'ink'
+  widgetPinned?: boolean
+  widgetSize?: 'small' | 'wide'
   createdAt: number
   updatedAt: number
   deletedAt?: number

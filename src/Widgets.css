@@ -17,7 +17,7 @@
 .preset-swatch { width: 9px; height: 34px; border-radius: 5px; background: var(--accent); }
 .swatch-cream { background: #f0e5ca; }.swatch-yellow { background: #ffd84d; }.swatch-blue { background: #b8d8df; }.swatch-green { background: #b9d0af; }.swatch-ink { background: var(--ink); }
 .preset-arrow { color: var(--muted); font-size: 16px; }
-.template-link { margin-top: 18px; border: 0; background: transparent; color: var(--accent); font-size: 12px; font-weight: 700; }
+.template-link { margin-top: 18px; border: 0; background: transparent; color: var(--accent); font-size: 12px; font-weight: 700; }.template-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }.template-guide { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgb(0 0 0 / .35); }.template-guide-card { max-width: 460px; padding: 26px; border: var(--border-width) solid var(--ink); border-radius: 14px; background: var(--surface); box-shadow: 6px 6px 0 var(--ink); }.template-guide-card h2 { margin-top: 8px; font-family: Caveat, cursive; font-size: 36px; }.template-guide-card code { color: var(--accent); }
 .widget-workbench { display: grid; gap: 24px; min-width: 0; }
 .widget-preview { min-height: 270px; display: flex; flex-direction: column; padding: 22px 26px 18px; border: var(--border-width) solid var(--ink); border-radius: 14px; color: #1f2430; box-shadow: 6px 6px 0 var(--ink); }
 .preview-cream { background: #f5eddb; }.preview-yellow { background: #ffd84d; }.preview-blue { background: #c5e2e7; }.preview-green { background: #c8d9be; }.preview-ink { background: #252b38; color: #f9f2df; }
