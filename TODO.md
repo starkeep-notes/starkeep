@@ -1,6 +1,12 @@
-# Dashboard-inspired UI plan
+# Personal-space product plan
 
-- [x] Rework the Board into a dashboard grid with summary cards, prominent actions, and Keep-inspired widget hierarchy.
+## Product direction
+
+Starkeep should feel like a personal space a person builds over time, not a note app with a dashboard attached. The board is the primary experience: a place to collect thoughts, save interesting discoveries, keep small reminders, display favorite quotes, track what matters, and add playful widgets with no purpose beyond delight.
+
+The product question is **“What do you want to keep close?”** rather than **“What do you want to write?”** Notes, collections, and web references remain important, but are building blocks alongside reminders, quotes, trackers, lists, and other board cards. Prioritize quick capture, a small set of useful and expressive card types, and easy arranging before expanding the advanced widget builder.
+
+- [x] Rework the Board into a personal-space grid with summary cards, prominent actions, and Keep-inspired widget hierarchy.
 - [x] Polish the compact sidebar rail and active navigation states to match the reference dashboard.
 - [x] Restructure widget creation into a three-column template, customization, and live-preview builder.
 - [x] Refine the syntax editor with line-oriented presentation, validation status, preview, and cheat sheet.
@@ -12,7 +18,7 @@
 - [ ] Add widget block reordering, duplication, and deletion controls.
 - [ ] Add callout, divider, list, and chart blocks with block-level validation.
 
-## Dashboard ideas
+## Board ideas
 
 ### High-value next steps
 1. **Quick capture bar**  
@@ -21,7 +27,7 @@
 2. **Widget grouping**  
    Support sections such as *Today*, *Projects*, *Reference*, and *Personal*.
 
-3. **Dashboard views**  
+3. **Board views**  
    Add presets like:
    - Focus
    - All widgets
@@ -62,8 +68,8 @@
 - A “shuffle layout” action for experimentation.
 
 ### Longer-term features
-- Multi-select widgets for bulk hide, delete, or recolor.
-- Dashboard layout presets with save/restore.
-- Import/export dashboard layouts separately from note data.
-- Optional date-based widgets such as calendar, countdown, and daily focus.
-- Lightweight charts and statistics based on local notebook data.
+- Multi-select cards for bulk hide, delete, or recolor.
+- Board layout presets with save/restore.
+- Import/export board layouts separately from personal-space data.
+- Optional date-based cards such as calendar, countdown, and daily focus.
+- Lightweight charts and statistics based on locally stored items.

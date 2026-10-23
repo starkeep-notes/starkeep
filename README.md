@@ -1,6 +1,8 @@
 # Starkeep
 
-Starkeep is a local-first personal notebook for notes, collections, and optional web references. Its compact sticker workspace keeps a searchable note list beside the editor on larger screens and switches to a single-pane view on phones. Use the theme selector in the navigation rail to switch between Sticker, Quiet minimal, and Dark ink; your choice stays on this device.
+Starkeep is a local-first personal space for the things you want to keep close: passing thoughts, interesting finds, little reminders, favorite quotes, personal trackers, and completely unnecessary widgets that make you smile. Rather than centering a note editor, it centers an editable board where these pieces can live together.
+
+Notes, collections, and optional web references remain useful building blocks, but they support the board rather than defining the product. The compact sticker workspace keeps a searchable library alongside the board and editor on larger screens, then shifts to a single-pane view on phones. Use the theme selector in the navigation rail to switch between Sticker, Quiet minimal, and Dark ink; your choice stays on this device.
 
 ## Local development
 
@@ -18,9 +20,9 @@ npm run lint
 npm run build
 ```
 
-## Editing notes and widgets
+## Editing cards
 
-Notes use a rich-text editor. Widgets have a visual builder and a syntax editor that edit the same widget content. Switching an existing rich-text note to a widget converts its content to plain widget text; the app asks for confirmation before formatting is lost. Switching a widget back to a note keeps its text, but does not restore previous rich formatting. Changes are saved locally in this browser.
+Notes use a rich-text editor and can become cards on the board. Widgets have a visual builder and a syntax editor that edit the same widget content. Switching an existing rich-text note to a widget converts its content to plain widget text; the app asks for confirmation before formatting is lost. Switching a widget back to a note keeps its text, but does not restore previous rich formatting. Changes are saved locally in this browser.
 
 ## Visual language
 
