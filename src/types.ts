@@ -7,6 +7,7 @@ export type Note = {
   title: string
   content: NoteContent
   collectionId?: string
+  boardId?: string
   isWidget?: boolean
   widgetStyle?: 'cream' | 'yellow' | 'blue' | 'green' | 'ink'
   widgetPinned?: boolean

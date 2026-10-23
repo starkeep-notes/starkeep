@@ -3,11 +3,11 @@ import { database } from './db'
 import type { Board, Collection, Note, WebReference } from './types'
 
 export const BACKUP_FORMAT = 'starkeep-notebook'
-export const BACKUP_VERSION = 2
+export const BACKUP_VERSION = 3
 
 type BackupPayload = {
   format: typeof BACKUP_FORMAT
-  version: 1 | typeof BACKUP_VERSION
+  version: 1 | 2 | typeof BACKUP_VERSION
   exportedAt: string
   notes: Array<Omit<Note, 'content'> & { content: { ops: unknown[] } }>
   collections: Collection[]
@@ -31,7 +31,7 @@ function assert(condition: unknown, message: string): asserts condition { if (!c
 function validatePayload(value: unknown): BackupPayload {
   assert(isRecord(value), 'The backup must contain a JSON object.')
   assert(value.format === BACKUP_FORMAT, 'This file is not a Starkeep backup.')
-  assert(value.version === 1 || value.version === BACKUP_VERSION, `Unsupported backup version: ${String(value.version)}.`)
+  assert(value.version === 1 || value.version === 2 || value.version === BACKUP_VERSION, `Unsupported backup version: ${String(value.version)}.`)
   assert(typeof value.exportedAt === 'string', 'The backup is missing its export date.')
   assert(Array.isArray(value.notes) && Array.isArray(value.collections), 'The backup must contain notes and collections arrays.')
   assert(value.webReferences === undefined || Array.isArray(value.webReferences), 'Web references must be an array.')
@@ -62,6 +62,7 @@ function validatePayload(value: unknown): BackupPayload {
     assert(isRecord(item.content) && Array.isArray(item.content.ops), `Note ${index + 1} has invalid editor content.`)
     assert(isTimestamp(item.createdAt) && isTimestamp(item.updatedAt) && isOptionalTimestamp(item.deletedAt), `Note ${index + 1} has invalid timestamps.`)
     assert(item.collectionId === undefined || isId(item.collectionId), `Note ${index + 1} has an invalid collection.`)
+    assert(item.boardId === undefined || isId(item.boardId), `Note ${index + 1} has an invalid board.`)
     assert(item.isWidget === undefined || typeof item.isWidget === 'boolean', `Note ${index + 1} has an invalid widget flag.`)
     assert(isOptionalWidgetStyle(item.widgetStyle), `Note ${index + 1} has an invalid widget style.`)
     assert(isOptionalBoolean(item.widgetPinned) && isOptionalBoolean(item.widgetHidden), `Note ${index + 1} has invalid widget visibility settings.`)
@@ -83,9 +84,9 @@ function validatePayload(value: unknown): BackupPayload {
     referenceIds.add(item.id)
   })
   collections.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.parentId === undefined || collectionIds.has(item.parentId as string), `Collection ${item.id as string} refers to a missing parent.`) })
-  notes.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.collectionId === undefined || collectionIds.has(item.collectionId as string), `Note ${item.id as string} refers to a missing collection.`); assert(item.widgetBoardId === undefined || boardIds.has(item.widgetBoardId as string), `Note ${item.id as string} refers to a missing board.`) })
+  notes.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.collectionId === undefined || collectionIds.has(item.collectionId as string), `Note ${item.id as string} refers to a missing collection.`); assert(item.boardId === undefined || boardIds.has(item.boardId as string), `Note ${item.id as string} refers to a missing board.`); assert(item.widgetBoardId === undefined || boardIds.has(item.widgetBoardId as string), `Note ${item.id as string} refers to a missing board.`) })
   webReferences.forEach((raw) => { const item = raw as Record<string, unknown>; assert(noteIds.has(item.noteId as string), `Web reference ${item.id as string} refers to a missing note.`) })
-  return { format: BACKUP_FORMAT, version: value.version as 1 | typeof BACKUP_VERSION, exportedAt: value.exportedAt, notes: notes as BackupPayload['notes'], collections: collections as Collection[], webReferences: webReferences as WebReference[], boards: boards as Board[] }
+  return { format: BACKUP_FORMAT, version: value.version as 1 | 2 | typeof BACKUP_VERSION, exportedAt: value.exportedAt, notes: notes as BackupPayload['notes'], collections: collections as Collection[], webReferences: webReferences as WebReference[], boards: boards as Board[] }
 }
 
 export async function exportBackup(): Promise<BackupPayload> {
@@ -106,7 +107,7 @@ export async function importBackup(input: unknown, mode: ImportMode): Promise<Im
   const collectionIds = new Map(payload.collections.map((item) => [item.id, mode === 'merge' && usedCollections.has(item.id) ? nextId(usedCollections) : (usedCollections.add(item.id), item.id)]))
   const referenceIds = new Map(payload.webReferences.map((item) => [item.id, mode === 'merge' && usedReferences.has(item.id) ? nextId(usedReferences) : (usedReferences.add(item.id), item.id)]))
   const boardIds = new Map(payload.boards.map((item) => [item.id, mode === 'merge' && usedBoards.has(item.id) ? nextId(usedBoards) : (usedBoards.add(item.id), item.id)]))
-  const notes = payload.notes.map((item) => ({ ...item, id: noteIds.get(item.id)!, collectionId: item.collectionId ? collectionIds.get(item.collectionId) : undefined, widgetBoardId: item.widgetBoardId ? boardIds.get(item.widgetBoardId) : undefined, content: new Delta(item.content as never) })) as Note[]
+  const notes = payload.notes.map((item) => ({ ...item, id: noteIds.get(item.id)!, collectionId: item.collectionId ? collectionIds.get(item.collectionId) : undefined, boardId: item.boardId ? boardIds.get(item.boardId) : undefined, widgetBoardId: item.widgetBoardId ? boardIds.get(item.widgetBoardId) : undefined, content: new Delta(item.content as never) })) as Note[]
   const collections = payload.collections.map((item) => ({ ...item, id: collectionIds.get(item.id)!, parentId: item.parentId ? collectionIds.get(item.parentId) : undefined }))
   const webReferences = payload.webReferences.map((item) => ({ ...item, id: referenceIds.get(item.id)!, noteId: noteIds.get(item.noteId)! }))
   const boards = payload.boards.map((item) => ({ ...item, id: boardIds.get(item.id)! }))

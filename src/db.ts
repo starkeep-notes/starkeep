@@ -20,6 +20,12 @@ export class StarkeepDatabase extends Dexie {
       webReferences: 'id, noteId, url',
       boards: 'id, updatedAt',
     })
+    this.version(3).stores({
+      notes: 'id, updatedAt, collectionId, boardId, deletedAt, widgetBoardId, widgetGroup',
+      collections: 'id, parentId, updatedAt',
+      webReferences: 'id, noteId, url',
+      boards: 'id, updatedAt',
+    })
   }
 }
 

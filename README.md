@@ -26,7 +26,7 @@ Notes use a rich-text editor and can become cards on the board. Widgets have a v
 
 ## Boards
 
-Boards are stored locally with their widget layouts. Select a widget to reveal its edit, resize, grouping, pin, duplicate, hide, and layout actions. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its widgets to that board.
+Boards are stored locally with their widget layouts and note assignments. Select a note or widget on a board to reveal its actions, including an accessible board picker for moving it. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its notes and widgets to that board.
 
 ## Visual language
 
