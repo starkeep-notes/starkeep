@@ -29,13 +29,30 @@ function WidgetTokenView({ node, updateAttributes }: TokenViewProps) {
   const source = String(node.attrs.source ?? '')
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState(tokenSource(key))
+  const popoverRef = useRef<HTMLSpanElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!(event.target instanceof Element) || !popoverRef.current?.contains(event.target)) setOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      setOpen(false)
+      requestAnimationFrame(() => triggerRef.current?.focus())
+    }
+    document.addEventListener('pointerdown', closeOnOutsidePointer)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => { document.removeEventListener('pointerdown', closeOnOutsidePointer); document.removeEventListener('keydown', closeOnEscape) }
+  }, [open])
   const save = () => {
     const match = draft.trim().match(/^\{\{\s*([\w.]+)(?:\s*\|[^}]+)?\s*\}\}$/)
     if (match) { updateAttributes({ key: match[1], source: draft.trim() }); setOpen(false) }
   }
-  return <NodeViewWrapper as="span" className="builder-token-wrap" data-widget-token={key} contentEditable={false}>
-    <button type="button" className="builder-token" onClick={() => { setDraft(source || tokenSource(key)); setOpen(true) }} aria-label={`Dynamic value ${key}. Edit token`}>{key}</button>
-    {open && <span className="token-popover" role="dialog" aria-label="Edit token syntax"><label>Token syntax<input autoFocus value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') save(); if (event.key === 'Escape') setOpen(false) }} /></label><span className="token-popover-actions"><button type="button" onClick={save}>Save</button><button type="button" className="text-button" onClick={() => setOpen(false)}>Cancel</button></span></span>}
+  return <NodeViewWrapper ref={popoverRef} as="span" className="builder-token-wrap" data-widget-token={key} contentEditable={false}>
+    <button ref={triggerRef} type="button" className="builder-token" onClick={() => { setDraft(source || tokenSource(key)); setOpen(true) }} aria-label={`Dynamic value ${key}. Edit token`}>{key}</button>
+    {open && <span className="token-popover" role="dialog" aria-label="Edit token syntax"><label>Token syntax<input autoFocus value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') save() }} /></label><span className="token-popover-actions"><button type="button" onClick={save}>Save</button><button type="button" className="text-button" onClick={() => { setOpen(false); requestAnimationFrame(() => triggerRef.current?.focus()) }}>Cancel</button></span></span>}
   </NodeViewWrapper>
 }
 

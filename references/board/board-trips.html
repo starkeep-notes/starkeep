@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>keep — Board: Trips</title>
+</head>
+<body>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:Inter,sans-serif;color:#1f2430}
+.seg{display:flex;gap:6px;padding:5px;border:2px solid #1f2430;border-radius:18px;background:#fff}
+.tab{height:44px;padding:0 18px;border:2px solid transparent;border-radius:13px;background:transparent;font-size:15px;font-weight:600;cursor:pointer}
+.tab[aria-pressed="true"]{background:#ffd84d;border-color:#1f2430;box-shadow:2px 2px 0 #1f2430}
+.col{flex:1;display:flex;flex-direction:column;gap:14px;border:2px dashed #1f2430;border-radius:22px;padding:16px;box-sizing:border-box;background:#fff4c2}
+.h{font-family:Caveat,cursive;font-size:32px;font-weight:600;line-height:1;display:flex;justify-content:space-between;align-items:baseline}
+.h span{font-family:Inter,sans-serif;font-size:13px}
+.k{background:#fff;border:2px solid #1f2430;border-radius:16px;padding:14px;box-shadow:4px 4px 0 #1f2430}
+.k b{display:block;font-size:16px}
+.k i{display:block;font-style:normal;font-size:13px;color:#4a4f5c;margin-top:4px;line-height:1.4}
+</style>
+
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #fffdf7; color: #1f2430; font-family: Inter, sans-serif; padding: 28px 48px; display: flex; flex-direction: column; gap: 24px; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 20px">
+<h1 style="margin: 0; font-family: Caveat, cursive; font-size: 54px; font-weight: 600; line-height: 1">Boards</h1>
+<div class="seg" role="group" aria-label="Choose a board">
+<button class="tab" aria-pressed="true">Trips</button>
+<button class="tab" aria-pressed="false">Pinboard</button>
+<button class="tab" aria-pressed="false">+ New board</button>
+</div>
+<div style="flex: 1"></div>
+<button style="height: 44px; padding: 0 18px; border: 2px solid #1f2430; border-radius: 14px; background: #ffd84d; box-shadow: 3px 3px 0 #1f2430; font-size: 14px; font-weight: 600; cursor: pointer">+ New card</button>
+</div>
+<div style="display: flex; gap: 24px; flex: 1; min-height: 0">
+<div class="col">
+<div class="h">Ideas <span>3</span></div>
+<div class="k" style="transform: rotate(-0.6deg)"><b>Lisbon in spring</b><i>Tile walks, custard tarts, the tiny ceramics shop.</i></div>
+<div class="k" style="transform: rotate(0.5deg)"><b>Night train north</b><i>Sleeper cabin, window seat, no alarm.</i></div>
+<div class="k" style="transform: rotate(-0.3deg)"><b>Coast hike</b><i>Pick a weekend with good weather.</i></div>
+</div>
+<div class="col" style="background: #fffdf7">
+<div class="h">Booked <span>2</span></div>
+<div class="k" style="background: #ffd84d; transform: rotate(0.5deg)"><b>Flights</b><i style="color: #1f2430">Confirmation saved in Found.</i></div>
+<div class="k" style="transform: rotate(-0.5deg)"><b>Guesthouse, 4 nights</b><i>Ask about late check-in.</i></div>
+</div>
+<div class="col">
+<div class="h">Packing <span>1 of 3</span></div>
+<div class="k" style="transform: rotate(0.4deg)"><b>Chargers and adapter</b><i>Done.</i></div>
+<div class="k" style="transform: rotate(-0.5deg)"><b>Good walking shoes</b><i>Break them in this week.</i></div>
+<div class="k" style="transform: rotate(0.3deg)"><b>Notebook and pens</b><i>For the train.</i></div>
+</div>
+</div>
+</div>
+
+</body>
+</html>

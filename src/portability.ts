@@ -1,41 +1,55 @@
 import Delta from 'quill-delta'
 import { database } from './db'
-import type { Collection, Note, WebReference } from './types'
+import type { Board, BoardGroup, Collection, Note, WebReference } from './types'
 
 export const BACKUP_FORMAT = 'starkeep-notebook'
-export const BACKUP_VERSION = 1
+export const BACKUP_VERSION = 5
 
 type BackupPayload = {
   format: typeof BACKUP_FORMAT
-  version: typeof BACKUP_VERSION
+  version: 1 | 2 | 3 | 4 | typeof BACKUP_VERSION
   exportedAt: string
   notes: Array<Omit<Note, 'content'> & { content: { ops: unknown[] } }>
   collections: Collection[]
   webReferences: WebReference[]
+  boards: Board[]
+  boardGroups: BoardGroup[]
 }
 
 export type ImportMode = 'merge' | 'replace'
-export type ImportSummary = { notes: number; collections: number; webReferences: number; mode: ImportMode }
+export type ImportSummary = { notes: number; collections: number; webReferences: number; boards: number; boardGroups: number; mode: ImportMode }
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null
 const isId = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
 const isTimestamp = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0
 const isOptionalTimestamp = (value: unknown): value is number | undefined => value === undefined || isTimestamp(value)
+const isOptionalBoolean = (value: unknown): value is boolean | undefined => value === undefined || typeof value === 'boolean'
+const isOptionalWidgetStyle = (value: unknown) => value === undefined || value === 'cream' || value === 'yellow' || value === 'blue' || value === 'green' || value === 'ink'
+const isOptionalWidgetSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large' || value === 'wide'
+const isOptionalBoardSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large'
+const isOptionalVerticalSize = (value: unknown) => value === undefined || value === 'short' || value === 'medium' || value === 'tall'
+const isOptionalWidgetOrder = (value: unknown) => value === undefined || (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0)
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message) }
 
 function validatePayload(value: unknown): BackupPayload {
   assert(isRecord(value), 'The backup must contain a JSON object.')
   assert(value.format === BACKUP_FORMAT, 'This file is not a Starkeep backup.')
-  assert(value.version === BACKUP_VERSION, `Unsupported backup version: ${String(value.version)}.`)
+  assert(value.version === 1 || value.version === 2 || value.version === 3 || value.version === 4 || value.version === BACKUP_VERSION, `Unsupported backup version: ${String(value.version)}.`)
   assert(typeof value.exportedAt === 'string', 'The backup is missing its export date.')
   assert(Array.isArray(value.notes) && Array.isArray(value.collections), 'The backup must contain notes and collections arrays.')
   assert(value.webReferences === undefined || Array.isArray(value.webReferences), 'Web references must be an array.')
+  assert(value.boards === undefined || Array.isArray(value.boards), 'Boards must be an array.')
+  assert(value.boardGroups === undefined || Array.isArray(value.boardGroups), 'Board groups must be an array.')
   const collections = value.collections as unknown[]
   const notes = value.notes as unknown[]
   const webReferences = (value.webReferences ?? []) as unknown[]
+  const boards = (value.boards ?? []) as unknown[]
+  const boardGroups = (value.boardGroups ?? []) as unknown[]
   const collectionIds = new Set<string>()
   const noteIds = new Set<string>()
   const referenceIds = new Set<string>()
+  const boardIds = new Set<string>()
+  const boardGroupIds = new Set<string>()
   collections.forEach((item, index) => {
     assert(isRecord(item) && isId(item.id) && typeof item.name === 'string' && item.name.trim(), `Collection ${index + 1} is invalid.`)
     assert(isTimestamp(item.createdAt) && isTimestamp(item.updatedAt), `Collection ${index + 1} has invalid timestamps.`)
@@ -43,11 +57,34 @@ function validatePayload(value: unknown): BackupPayload {
     assert(!collectionIds.has(item.id), `Duplicate collection ID: ${item.id}.`)
     collectionIds.add(item.id)
   })
+  boards.forEach((item, index) => {
+    assert(isRecord(item) && isId(item.id) && typeof item.name === 'string' && item.name.trim(), `Board ${index + 1} is invalid.`)
+    assert(isTimestamp(item.createdAt) && isTimestamp(item.updatedAt), `Board ${index + 1} has invalid timestamps.`)
+    assert(!boardIds.has(item.id), `Duplicate board ID: ${item.id}.`)
+    boardIds.add(item.id)
+  })
+  boardGroups.forEach((item, index) => {
+    assert(isRecord(item) && isId(item.id) && isId(item.boardId) && typeof item.name === 'string' && item.name.trim(), `Board group ${index + 1} is invalid.`)
+    assert(isOptionalWidgetOrder(item.order) && [1, 2, 3, 4].includes(item.columnSpan as number) && ['compact', 'normal', 'tall'].includes(item.verticalSize as string) && typeof item.collapsed === 'boolean', `Board group ${index + 1} has invalid layout.`)
+    assert(!boardGroupIds.has(item.id), `Duplicate board group ID: ${item.id}.`)
+    boardGroupIds.add(item.id)
+  })
   notes.forEach((item, index) => {
     assert(isRecord(item) && isId(item.id) && typeof item.title === 'string', `Note ${index + 1} is invalid.`)
     assert(isRecord(item.content) && Array.isArray(item.content.ops), `Note ${index + 1} has invalid editor content.`)
     assert(isTimestamp(item.createdAt) && isTimestamp(item.updatedAt) && isOptionalTimestamp(item.deletedAt), `Note ${index + 1} has invalid timestamps.`)
     assert(item.collectionId === undefined || isId(item.collectionId), `Note ${index + 1} has an invalid collection.`)
+    assert(item.boardId === undefined || isId(item.boardId), `Note ${index + 1} has an invalid board.`)
+    assert(item.isWidget === undefined || typeof item.isWidget === 'boolean', `Note ${index + 1} has an invalid widget flag.`)
+    assert(isOptionalWidgetStyle(item.widgetStyle), `Note ${index + 1} has an invalid widget style.`)
+    assert(isOptionalBoolean(item.widgetPinned) && isOptionalBoolean(item.widgetHidden), `Note ${index + 1} has invalid widget visibility settings.`)
+    assert(isOptionalWidgetOrder(item.widgetOrder), `Note ${index + 1} has an invalid widget order.`)
+    assert(isOptionalWidgetSize(item.widgetSize), `Note ${index + 1} has an invalid widget width.`)
+    assert(isOptionalBoardSize(item.boardSize), `Note ${index + 1} has an invalid board note width.`)
+    assert(isOptionalVerticalSize(item.boardHeight), `Note ${index + 1} has an invalid board note height.`)
+    assert(item.widgetBoardId === undefined || isId(item.widgetBoardId), `Note ${index + 1} has an invalid board.`)
+    assert(item.widgetHeight === undefined || item.widgetHeight === 'short' || item.widgetHeight === 'medium' || item.widgetHeight === 'tall', `Note ${index + 1} has an invalid widget height.`)
+    assert(item.widgetGroup === undefined || (typeof item.widgetGroup === 'string' && item.widgetGroup.trim()), `Note ${index + 1} has an invalid widget group.`)
     try { new Delta(item.content as never) } catch { throw new Error(`Note ${index + 1} has unreadable editor content.`) }
     assert(!noteIds.has(item.id), `Duplicate note ID: ${item.id}.`)
     noteIds.add(item.id)
@@ -61,35 +98,60 @@ function validatePayload(value: unknown): BackupPayload {
     referenceIds.add(item.id)
   })
   collections.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.parentId === undefined || collectionIds.has(item.parentId as string), `Collection ${item.id as string} refers to a missing parent.`) })
-  notes.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.collectionId === undefined || collectionIds.has(item.collectionId as string), `Note ${item.id as string} refers to a missing collection.`) })
+  boardGroups.forEach((raw) => { const item = raw as Record<string, unknown>; assert(boardIds.has(item.boardId as string), `Board group ${item.id as string} refers to a missing board.`) })
+  notes.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.collectionId === undefined || collectionIds.has(item.collectionId as string), `Note ${item.id as string} refers to a missing collection.`); assert(item.boardId === undefined || boardIds.has(item.boardId as string), `Note ${item.id as string} refers to a missing board.`); assert(item.widgetBoardId === undefined || boardIds.has(item.widgetBoardId as string), `Note ${item.id as string} refers to a missing board.`); assert(item.groupId === undefined || boardGroupIds.has(item.groupId as string), `Note ${item.id as string} refers to a missing board group.`) })
   webReferences.forEach((raw) => { const item = raw as Record<string, unknown>; assert(noteIds.has(item.noteId as string), `Web reference ${item.id as string} refers to a missing note.`) })
-  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, exportedAt: value.exportedAt, notes: notes as BackupPayload['notes'], collections: collections as Collection[], webReferences: webReferences as WebReference[] }
+  return { format: BACKUP_FORMAT, version: value.version as 1 | 2 | 3 | 4 | typeof BACKUP_VERSION, exportedAt: value.exportedAt, notes: notes as BackupPayload['notes'], collections: collections as Collection[], webReferences: webReferences as WebReference[], boards: boards as Board[], boardGroups: boardGroups as BoardGroup[] }
 }
 
 export async function exportBackup(): Promise<BackupPayload> {
-  const [notes, collections, webReferences] = await Promise.all([database.notes.toArray(), database.collections.toArray(), database.webReferences.toArray()])
-  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), notes: notes.map((note) => ({ ...note, content: note.content instanceof Delta ? { ops: note.content.ops } : note.content })), collections, webReferences }
+  const [notes, collections, webReferences, boards, boardGroups] = await Promise.all([database.notes.toArray(), database.collections.toArray(), database.webReferences.toArray(), database.boards.toArray(), database.boardGroups.toArray()])
+  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), notes: notes.map((note) => ({ ...note, content: note.content instanceof Delta ? { ops: note.content.ops } : note.content })), collections, webReferences, boards, boardGroups }
 }
 
 const nextId = (used: Set<string>) => { let id = crypto.randomUUID(); while (used.has(id)) id = crypto.randomUUID(); used.add(id); return id }
 
 export async function importBackup(input: unknown, mode: ImportMode): Promise<ImportSummary> {
   const payload = validatePayload(input)
-  const existing = mode === 'merge' ? await Promise.all([database.notes.toArray(), database.collections.toArray(), database.webReferences.toArray()]) : [[], [], []] as const
+  const existing = mode === 'merge' ? await Promise.all([database.notes.toArray(), database.collections.toArray(), database.webReferences.toArray(), database.boards.toArray(), database.boardGroups.toArray()]) : [[], [], [], [], []] as const
   const usedNotes = new Set(existing[0].map((item) => item.id))
   const usedCollections = new Set(existing[1].map((item) => item.id))
   const usedReferences = new Set(existing[2].map((item) => item.id))
+  const usedBoards = new Set(existing[3].map((item) => item.id))
+  const usedGroups = new Set(existing[4].map((item) => item.id))
   const noteIds = new Map(payload.notes.map((item) => [item.id, mode === 'merge' && usedNotes.has(item.id) ? nextId(usedNotes) : (usedNotes.add(item.id), item.id)]))
   const collectionIds = new Map(payload.collections.map((item) => [item.id, mode === 'merge' && usedCollections.has(item.id) ? nextId(usedCollections) : (usedCollections.add(item.id), item.id)]))
   const referenceIds = new Map(payload.webReferences.map((item) => [item.id, mode === 'merge' && usedReferences.has(item.id) ? nextId(usedReferences) : (usedReferences.add(item.id), item.id)]))
-  const notes = payload.notes.map((item) => ({ ...item, id: noteIds.get(item.id)!, collectionId: item.collectionId ? collectionIds.get(item.collectionId) : undefined, content: new Delta(item.content as never) })) as Note[]
+  const groupIds = new Map(payload.boardGroups.map((item) => [item.id, mode === 'merge' && usedGroups.has(item.id) ? nextId(usedGroups) : (usedGroups.add(item.id), item.id)]))
+  const boardIds = new Map(payload.boards.map((item) => [item.id, mode === 'merge' && usedBoards.has(item.id) ? nextId(usedBoards) : (usedBoards.add(item.id), item.id)]))
+  const notes = payload.notes.map((item) => ({ ...item, id: noteIds.get(item.id)!, collectionId: item.collectionId ? collectionIds.get(item.collectionId) : undefined, boardId: item.boardId ? boardIds.get(item.boardId) : undefined, widgetBoardId: item.widgetBoardId ? boardIds.get(item.widgetBoardId) : undefined, groupId: item.groupId ? groupIds.get(item.groupId) : undefined, content: new Delta(item.content as never) })) as Note[]
   const collections = payload.collections.map((item) => ({ ...item, id: collectionIds.get(item.id)!, parentId: item.parentId ? collectionIds.get(item.parentId) : undefined }))
   const webReferences = payload.webReferences.map((item) => ({ ...item, id: referenceIds.get(item.id)!, noteId: noteIds.get(item.noteId)! }))
-  await database.transaction('rw', database.notes, database.collections, database.webReferences, async () => {
-    if (mode === 'replace') { await database.webReferences.clear(); await database.notes.clear(); await database.collections.clear() }
+  const boards = payload.boards.map((item) => ({ ...item, id: boardIds.get(item.id)! }))
+  const boardGroups = payload.boardGroups.map((item) => ({ ...item, id: groupIds.get(item.id)!, boardId: boardIds.get(item.boardId)! }))
+  // Versions before persisted Ungrouped groups can contain cards without a group.
+  // Normalize them during import because a database upgrade does not run after an import.
+  for (const board of boards) {
+    const groupsForBoard = boardGroups.filter((group) => group.boardId === board.id)
+    let ungrouped = groupsForBoard.find((group) => group.name === 'Ungrouped')
+    if (!ungrouped) {
+      ungrouped = { id: nextId(usedGroups), boardId: board.id, name: 'Ungrouped', order: groupsForBoard.reduce((maximum, group) => Math.max(maximum, group.order), -1) + 1, columnSpan: 1 as const, verticalSize: 'normal' as const, collapsed: false }
+      boardGroups.push(ungrouped)
+      groupsForBoard.push(ungrouped)
+    }
+    const validGroupIds = new Set(groupsForBoard.map((group) => group.id))
+    notes.forEach((note) => {
+      if ((note.isWidget ? note.widgetBoardId : note.boardId) === board.id && (!note.groupId || !validGroupIds.has(note.groupId))) note.groupId = ungrouped.id
+    })
+  }
+  await database.transaction('rw', database.notes, database.collections, database.webReferences, database.boards, database.boardGroups, async () => {
+    if (mode === 'replace') { await database.boardGroups.clear(); await database.webReferences.clear(); await database.notes.clear(); await database.collections.clear(); await database.boards.clear() }
     await database.collections.bulkPut(collections)
     await database.notes.bulkPut(notes)
     await database.webReferences.bulkPut(webReferences)
+    await database.boards.bulkPut(boards)
+    await database.boardGroups.bulkPut(boardGroups)
   })
-  return { notes: notes.length, collections: collections.length, webReferences: webReferences.length, mode }
+  window.dispatchEvent(new Event('starkeep-notes-changed'))
+  return { notes: notes.length, collections: collections.length, webReferences: webReferences.length, boards: boards.length, boardGroups: boardGroups.length, mode }
 }
