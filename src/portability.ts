@@ -22,6 +22,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 const isId = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
 const isTimestamp = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0
 const isOptionalTimestamp = (value: unknown): value is number | undefined => value === undefined || isTimestamp(value)
+const isOptionalBoolean = (value: unknown): value is boolean | undefined => value === undefined || typeof value === 'boolean'
+const isOptionalWidgetStyle = (value: unknown) => value === undefined || value === 'cream' || value === 'yellow' || value === 'blue' || value === 'green' || value === 'ink'
+const isOptionalWidgetSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large' || value === 'wide'
+const isOptionalWidgetOrder = (value: unknown) => value === undefined || (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0)
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message) }
 
 function validatePayload(value: unknown): BackupPayload {
@@ -58,6 +62,11 @@ function validatePayload(value: unknown): BackupPayload {
     assert(isRecord(item.content) && Array.isArray(item.content.ops), `Note ${index + 1} has invalid editor content.`)
     assert(isTimestamp(item.createdAt) && isTimestamp(item.updatedAt) && isOptionalTimestamp(item.deletedAt), `Note ${index + 1} has invalid timestamps.`)
     assert(item.collectionId === undefined || isId(item.collectionId), `Note ${index + 1} has an invalid collection.`)
+    assert(item.isWidget === undefined || typeof item.isWidget === 'boolean', `Note ${index + 1} has an invalid widget flag.`)
+    assert(isOptionalWidgetStyle(item.widgetStyle), `Note ${index + 1} has an invalid widget style.`)
+    assert(isOptionalBoolean(item.widgetPinned) && isOptionalBoolean(item.widgetHidden), `Note ${index + 1} has invalid widget visibility settings.`)
+    assert(isOptionalWidgetOrder(item.widgetOrder), `Note ${index + 1} has an invalid widget order.`)
+    assert(isOptionalWidgetSize(item.widgetSize), `Note ${index + 1} has an invalid widget width.`)
     assert(item.widgetBoardId === undefined || isId(item.widgetBoardId), `Note ${index + 1} has an invalid board.`)
     assert(item.widgetHeight === undefined || item.widgetHeight === 'short' || item.widgetHeight === 'medium' || item.widgetHeight === 'tall', `Note ${index + 1} has an invalid widget height.`)
     assert(item.widgetGroup === undefined || (typeof item.widgetGroup === 'string' && item.widgetGroup.trim()), `Note ${index + 1} has an invalid widget group.`)
@@ -108,5 +117,6 @@ export async function importBackup(input: unknown, mode: ImportMode): Promise<Im
     await database.webReferences.bulkPut(webReferences)
     await database.boards.bulkPut(boards)
   })
+  window.dispatchEvent(new Event('starkeep-notes-changed'))
   return { notes: notes.length, collections: collections.length, webReferences: webReferences.length, boards: boards.length, mode }
 }
