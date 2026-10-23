@@ -4,8 +4,10 @@
 - [x] Polish the compact sidebar rail and active navigation states to match the reference dashboard.
 - [x] Restructure widget creation into a three-column template, customization, and live-preview builder.
 - [x] Refine the syntax editor with line-oriented presentation, validation status, preview, and cheat sheet.
-- [ ] Document the reference visual language and verify responsive, local-first, and GitHub Pages behavior.
-- [x] Add persisted flexible dashboard editing with dnd-kit: drag ordering, visibility, duplication, and small/medium/large widget sizing.
+- [x] Rework Quill, the Tiptap widget builder, and CodeMirror around a shared draft with reliable saves and confirmed rich-text conversion.
+- [x] Show a recovery screen instead of a blank page after an uncaught render error.
+- [x] Document the reference visual language and verify responsive layouts, local-first backup/merge safety, and GitHub Pages hash-route refreshes.
+- [x] Add persisted flexible dashboard editing with dnd-kit: drag-handle ordering, visibility, duplication, and small/medium/large widget sizing.
 - [x] Add structured widget blocks: headings, metrics, progress bars, and inline dynamic values.
 - [ ] Add widget block reordering, duplication, and deletion controls.
 - [ ] Add callout, divider, list, and chart blocks with block-level validation.
@@ -60,7 +62,6 @@
 - A “shuffle layout” action for experimentation.
 
 ### Longer-term features
-- Touch-friendly drag handles instead of dragging the entire card.
 - Multi-select widgets for bulk hide, delete, or recolor.
 - Dashboard layout presets with save/restore.
 - Import/export dashboard layouts separately from note data.
