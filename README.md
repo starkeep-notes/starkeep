@@ -18,6 +18,10 @@ npm run lint
 npm run build
 ```
 
+## Editing notes and widgets
+
+Notes use a rich-text editor. Widgets have a visual builder and a syntax editor that edit the same widget content. Switching an existing rich-text note to a widget converts its content to plain widget text; the app asks for confirmation before formatting is lost. Switching a widget back to a note keeps its text, but does not restore previous rich formatting. Changes are saved locally in this browser.
+
 ## GitHub Pages
 
 The `main` branch deploys through [GitHub Actions](./.github/workflows/deploy.yml) to [starkeep-notes.github.io](https://starkeep-notes.github.io/). The app uses hash routing, so notebook routes remain available when refreshed on GitHub Pages.

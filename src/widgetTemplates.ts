@@ -45,7 +45,10 @@ export function createTemplateValues(notes: Note[] = []): Record<string, string>
 export const templateValues = createTemplateValues()
 
 export function renderWidgetTemplate(template: string, values = templateValues) {
-  return template.replace(/{{\s*([\w.]+)(?:\s*\|[^}]+)?\s*}}/g, (_, key: string) => values[key] ?? `{{${key}}}`)
+  return template.replace(/{{\s*(?:(note)\(\s*"([^"]+)"\s*\)|([\w.]+))(?:\s*\|[^}]+)?\s*}}/g, (match: string, functionName: string | undefined, argument: string | undefined, key: string | undefined) => {
+    const resolvedKey = functionName ? argument?.toLowerCase() === 'title' ? 'notes.latest_title' : argument?.toLowerCase() === 'date' ? 'notes.latest_date' : undefined : key
+    return resolvedKey && values[resolvedKey] !== undefined ? values[resolvedKey] : match
+  })
 }
 
 export function loadSavedTemplates(): WidgetTemplate[] {

@@ -26,10 +26,11 @@ type SortableWidgetCardProps = {
 }
 
 function SortableWidgetCard({ note, layoutEditing, widgetValues, onEdit, onUpdate, onDuplicate }: SortableWidgetCardProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: note.id, disabled: !layoutEditing })
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: note.id, disabled: !layoutEditing })
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 1 : undefined }
-  return <article ref={setNodeRef} style={style} className={`board-widget-card widget-size-${note.widgetSize ?? 'medium'} preview-${note.widgetStyle ?? 'cream'} ${layoutEditing ? 'layout-editing' : ''} ${isDragging ? 'is-dragging' : ''}`} {...attributes} {...listeners}>
+  return <article ref={setNodeRef} style={style} className={`board-widget-card widget-size-${note.widgetSize ?? 'medium'} preview-${note.widgetStyle ?? 'cream'} ${layoutEditing ? 'layout-editing' : ''} ${isDragging ? 'is-dragging' : ''}`}>
     <div className="board-widget-actions">
+      {layoutEditing && <button ref={setActivatorNodeRef} type="button" className="widget-drag-handle" aria-label={`Drag ${note.title}`} {...attributes} {...listeners}>↕</button>}
       <button type="button" className="board-widget-edit" aria-label={`Edit ${note.title}`} onClick={onEdit}>Edit</button>
       <button type="button" className="board-widget-action" onClick={() => onUpdate({ widgetPinned: !note.widgetPinned })} aria-label={note.widgetPinned ? 'Unpin widget' : 'Pin widget'}>{note.widgetPinned ? '★' : '☆'}</button>
       <button type="button" className="board-widget-action" onClick={() => onUpdate({ widgetSize: note.widgetSize === 'small' ? 'medium' : note.widgetSize === 'medium' ? 'large' : note.widgetSize === 'large' ? 'wide' : 'small' })} aria-label={`Resize ${note.title}`}>↔</button>

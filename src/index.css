@@ -1,3 +1,5 @@
 :root { font-synthesis: weight; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
 html, body, #root { min-width: 320px; min-height: 100%; }
 #root { min-height: 100vh; }
+.app-error-fallback { max-width: 32rem; margin: 12vh auto; padding: 2rem; font-family: system-ui, sans-serif; }
+.app-error-fallback button { padding: .65rem 1rem; cursor: pointer; }

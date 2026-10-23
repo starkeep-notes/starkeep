@@ -38,3 +38,28 @@
 .widget-mode .builder-panel > :nth-child(5) { grid-column: 3; grid-row: 1 / span 4; margin-top: 0; position: sticky; top: 28px; }
 @media (max-width: 1000px) { .widget-mode .builder-panel { grid-template-columns: minmax(190px, .8fr) minmax(280px, 1.2fr); }.widget-mode .builder-panel > :nth-child(1) { grid-row: 1 / span 3; }.widget-mode .builder-panel > :nth-child(5) { grid-column: 2; grid-row: 1 / span 3; } }
 .widget-block-node { display: flex; flex-wrap: wrap; gap: 8px; margin: 5px 0; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; background: var(--surface-soft); }.widget-block-node label { display: grid; gap: 3px; color: var(--muted); font-size: 10px; font-weight: 700; }.widget-block-node input { width: 110px; border: 1px solid var(--line); border-radius: 5px; padding: 5px; background: var(--surface); color: var(--ink); font: 12px ui-monospace, monospace; }.preview-heading { margin-bottom: 8px; font-weight: 700; }.preview-heading-1 { font-size: 30px; }.preview-heading-2 { font-size: 23px; }.preview-heading-3 { font-size: 18px; }.preview-metric, .preview-progress { display: grid; gap: 5px; margin: 8px 0 14px; }.preview-metric { grid-template-columns: 1fr auto; align-items: end; }.preview-metric strong { font-size: 28px; }.preview-progress strong { font-size: 12px; }.preview-progress-track { height: 8px; overflow: hidden; border-radius: 99px; background: rgb(0 0 0 / .18); }.preview-progress-track i { display: block; height: 100%; border-radius: inherit; background: currentColor; }.builder-add { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 7px; }.builder-add button { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; background: var(--surface); color: var(--ink); font-size: 11px; }.builder-add button:hover, .builder-add button:focus { border-color: var(--accent); } @media (max-width: 800px) { .widget-mode .builder-panel { grid-template-columns: 1fr; }.widget-mode .builder-panel > :nth-child(n) { grid-column: 1; grid-row: auto; }.widget-mode .builder-panel > :nth-child(5) { position: static; } }
+
+.syntax-workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 18px; margin-top: 18px; align-items: start; }
+.syntax-editor-panel { margin-top: 0; }
+.syntax-status.has-errors { color: #9b2c2c; }
+.syntax-code-editor { display: grid; grid-template-columns: 48px minmax(0, 1fr); min-height: 250px; }
+.syntax-line-numbers { display: flex; flex-direction: column; padding: 18px 10px 18px 0; border-right: 1px solid #3b445a; color: #8b93a5; font: 15px/2 ui-monospace, Menlo, Consolas, monospace; text-align: right; user-select: none; }
+.syntax-line-numbers span { height: 30px; }
+.syntax-editor-panel textarea { min-height: 250px; margin: 0; padding: 18px 16px; }
+.syntax-issues { display: grid; gap: 6px; padding: 12px 16px; background: #fff0ed; color: #8f2d25; font-size: 12px; line-height: 1.45; }
+.syntax-issues strong { margin-right: 8px; }
+.syntax-reference { display: grid; gap: 10px; }
+.syntax-preview-heading { font-family: Caveat, cursive; font-size: 27px; font-weight: 600; }
+.syntax-preview-card { min-height: 110px; padding: 16px; border: 2px solid var(--ink); border-radius: 16px; box-shadow: 4px 4px 0 var(--ink); color: #1f2430; }
+.syntax-preview-card .preview-content { margin: 0; }
+.syntax-preview-card .preview-content p { margin: 5px 0; line-height: 1.45; }
+.syntax-preview-card .preview-content p:first-child { font-family: Caveat, cursive; font-size: 27px; }
+.syntax-cheat-sheet { display: grid; gap: 8px; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 14px; background: var(--surface); }
+.syntax-cheat-sheet p { display: grid; gap: 2px; margin: 0; }
+.syntax-cheat-sheet code { color: var(--ink); font: 12px ui-monospace, Menlo, Consolas, monospace; }
+.syntax-cheat-sheet span { color: var(--muted); font-size: 11px; }
+@media (max-width: 800px) { .syntax-workbench { grid-template-columns: 1fr; } }
+.syntax-code-mirror { min-height: 250px; border-bottom: 1px solid #3b445a; }
+.syntax-code-mirror .cm-editor { min-height: 250px; }
+.syntax-code-mirror .cm-editor.cm-focused { outline: none; }
+.syntax-code-mirror .cm-widget-expression { color: #ffd84d; }

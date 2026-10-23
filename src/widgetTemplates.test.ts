@@ -54,4 +54,8 @@ describe('renderWidgetTemplate', () => {
   it('supports optional pipe labels while resolving the variable', () => {
     expect(renderWidgetTemplate('{{notes.total | number}} notes', { 'notes.total': '12' })).toBe('12 notes')
   })
+
+  it('resolves note helper syntax used by the syntax editor', () => {
+    expect(renderWidgetTemplate('Latest: {{ note("title") }}', { 'notes.latest_title': 'Trip ideas' })).toBe('Latest: Trip ideas')
+  })
 })
