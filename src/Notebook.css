@@ -309,3 +309,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .widget-drag-handle { min-width: 28px; min-height: 28px; border: 1px solid currentColor; border-radius: 999px; padding: 3px 7px; background: transparent; color: inherit; font-size: 12px; cursor: grab; touch-action: none; }
 .widget-drag-handle:active { cursor: grabbing; }
+
+/* Board selection keeps advanced actions quiet until a card or group is intentionally selected. */
+.board-widget-group { border-radius: 14px; }
+.board-widget-group.selected { outline: 3px solid var(--accent); outline-offset: 5px; background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.group-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 5px; }
+.group-actions button, .group-size-picker, .note-size-picker, .widget-size-picker { min-height: 28px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; background: var(--surface); color: var(--ink); font-size: 10px; }
+.group-size-picker, .note-size-picker, .widget-size-picker { display: inline-flex; align-items: center; gap: 4px; }
+.group-size-picker select, .note-size-picker select, .widget-size-picker select { max-width: 88px; border: 0; background: transparent; color: inherit; font: inherit; }
+.board-resize-handle { min-height: 28px; border: 1px dashed currentColor; border-radius: 999px; padding: 3px 7px; background: var(--accent); color: var(--ink); font-size: 10px; cursor: ew-resize; touch-action: none; }
+.resize-mode { outline: 3px dashed var(--accent) !important; outline-offset: 5px; }
+.resize-mode .board-resize-handle { animation: resize-pulse 1.2s ease-in-out infinite; }
+.board-note-card.note-size-medium { grid-column: span 2; }
+.board-note-card.note-size-large { grid-column: span 3; }
+@keyframes resize-pulse { 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .resize-mode .board-resize-handle { animation: none; } }
+@media (max-width: 760px) { .board-note-card.note-size-large { grid-column: span 2; } }
+@media (max-width: 580px) { .board-note-card.note-size-medium, .board-note-card.note-size-large { grid-column: auto; } .group-actions { justify-content: flex-start; } }

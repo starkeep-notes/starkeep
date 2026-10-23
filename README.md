@@ -26,7 +26,7 @@ Notes use a rich-text editor and can become cards on the board. Widgets have a v
 
 ## Boards
 
-Boards are stored locally with their widget layouts and note assignments. Create named board groups to arrange widgets; group names, order, spans, height, and collapsed state stay on this device. Existing widget labels migrate safely to matching groups. Select a note or widget on a board to reveal its actions, including an accessible board picker for moving it. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its notes and widgets to that board.
+Boards are stored locally with their widget layouts and note assignments. Create named board groups to arrange widgets; group names, order, spans, height, and collapsed state stay on this device. Existing widget labels migrate safely to matching groups. Select a note, widget, or group on a board to reveal its actions, including an accessible board picker for moving it. Use **Resize** on a selected card or group to drag its width; the visible width controls remain available when dragging is not practical. Click the board background or press Escape to close board selections. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its notes and widgets to that board.
 
 ## Visual language
 

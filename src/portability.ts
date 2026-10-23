@@ -26,6 +26,7 @@ const isOptionalTimestamp = (value: unknown): value is number | undefined => val
 const isOptionalBoolean = (value: unknown): value is boolean | undefined => value === undefined || typeof value === 'boolean'
 const isOptionalWidgetStyle = (value: unknown) => value === undefined || value === 'cream' || value === 'yellow' || value === 'blue' || value === 'green' || value === 'ink'
 const isOptionalWidgetSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large' || value === 'wide'
+const isOptionalBoardSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large'
 const isOptionalWidgetOrder = (value: unknown) => value === undefined || (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0)
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message) }
 
@@ -78,6 +79,7 @@ function validatePayload(value: unknown): BackupPayload {
     assert(isOptionalBoolean(item.widgetPinned) && isOptionalBoolean(item.widgetHidden), `Note ${index + 1} has invalid widget visibility settings.`)
     assert(isOptionalWidgetOrder(item.widgetOrder), `Note ${index + 1} has an invalid widget order.`)
     assert(isOptionalWidgetSize(item.widgetSize), `Note ${index + 1} has an invalid widget width.`)
+    assert(isOptionalBoardSize(item.boardSize), `Note ${index + 1} has an invalid board note width.`)
     assert(item.widgetBoardId === undefined || isId(item.widgetBoardId), `Note ${index + 1} has an invalid board.`)
     assert(item.widgetHeight === undefined || item.widgetHeight === 'short' || item.widgetHeight === 'medium' || item.widgetHeight === 'tall', `Note ${index + 1} has an invalid widget height.`)
     assert(item.widgetGroup === undefined || (typeof item.widgetGroup === 'string' && item.widgetGroup.trim()), `Note ${index + 1} has an invalid widget group.`)
