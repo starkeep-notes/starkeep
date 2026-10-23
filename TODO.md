@@ -15,6 +15,7 @@ The product question is **“What do you want to keep close?”** rather than **
 - [x] Document the reference visual language and verify responsive layouts, local-first backup/merge safety, and GitHub Pages hash-route refreshes.
 - [x] Add persisted flexible dashboard editing with dnd-kit: drag-handle ordering, visibility, duplication, and small/medium/large widget sizing.
 - [x] Add structured widget blocks: headings, metrics, progress bars, and inline dynamic values.
+- [x] Add board switching, widget groups, and persisted horizontal/vertical widget resizing.
 - [ ] Add widget block reordering, duplication, and deletion controls.
 - [ ] Add callout, divider, list, and chart blocks with block-level validation.
 

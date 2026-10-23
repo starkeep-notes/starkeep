@@ -13,9 +13,19 @@ export type Note = {
   widgetHidden?: boolean
   widgetOrder?: number
   widgetSize?: 'small' | 'medium' | 'large' | 'wide'
+  widgetHeight?: 'short' | 'medium' | 'tall'
+  widgetBoardId?: string
+  widgetGroup?: string
   createdAt: number
   updatedAt: number
   deletedAt?: number
+}
+
+export type Board = {
+  id: string
+  name: string
+  createdAt: number
+  updatedAt: number
 }
 
 export type Collection = {
