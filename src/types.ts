@@ -16,6 +16,8 @@ export type Note = {
   widgetSize?: 'small' | 'medium' | 'large' | 'wide'
   /** Persisted board-note width, expressed as a grid column span. */
   boardSize?: 'small' | 'medium' | 'large'
+  /** Persisted board-note height. */
+  boardHeight?: 'short' | 'medium' | 'tall'
   widgetHeight?: 'short' | 'medium' | 'tall'
   widgetBoardId?: string
   /** @deprecated legacy display label, migrated to groupId on database upgrade. */

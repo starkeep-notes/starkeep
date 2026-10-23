@@ -3,11 +3,11 @@ import { database } from './db'
 import type { Board, BoardGroup, Collection, Note, WebReference } from './types'
 
 export const BACKUP_FORMAT = 'starkeep-notebook'
-export const BACKUP_VERSION = 4
+export const BACKUP_VERSION = 5
 
 type BackupPayload = {
   format: typeof BACKUP_FORMAT
-  version: 1 | 2 | 3 | typeof BACKUP_VERSION
+  version: 1 | 2 | 3 | 4 | typeof BACKUP_VERSION
   exportedAt: string
   notes: Array<Omit<Note, 'content'> & { content: { ops: unknown[] } }>
   collections: Collection[]
@@ -27,13 +27,14 @@ const isOptionalBoolean = (value: unknown): value is boolean | undefined => valu
 const isOptionalWidgetStyle = (value: unknown) => value === undefined || value === 'cream' || value === 'yellow' || value === 'blue' || value === 'green' || value === 'ink'
 const isOptionalWidgetSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large' || value === 'wide'
 const isOptionalBoardSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large'
+const isOptionalVerticalSize = (value: unknown) => value === undefined || value === 'short' || value === 'medium' || value === 'tall'
 const isOptionalWidgetOrder = (value: unknown) => value === undefined || (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0)
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message) }
 
 function validatePayload(value: unknown): BackupPayload {
   assert(isRecord(value), 'The backup must contain a JSON object.')
   assert(value.format === BACKUP_FORMAT, 'This file is not a Starkeep backup.')
-  assert(value.version === 1 || value.version === 2 || value.version === 3 || value.version === BACKUP_VERSION, `Unsupported backup version: ${String(value.version)}.`)
+  assert(value.version === 1 || value.version === 2 || value.version === 3 || value.version === 4 || value.version === BACKUP_VERSION, `Unsupported backup version: ${String(value.version)}.`)
   assert(typeof value.exportedAt === 'string', 'The backup is missing its export date.')
   assert(Array.isArray(value.notes) && Array.isArray(value.collections), 'The backup must contain notes and collections arrays.')
   assert(value.webReferences === undefined || Array.isArray(value.webReferences), 'Web references must be an array.')
@@ -80,6 +81,7 @@ function validatePayload(value: unknown): BackupPayload {
     assert(isOptionalWidgetOrder(item.widgetOrder), `Note ${index + 1} has an invalid widget order.`)
     assert(isOptionalWidgetSize(item.widgetSize), `Note ${index + 1} has an invalid widget width.`)
     assert(isOptionalBoardSize(item.boardSize), `Note ${index + 1} has an invalid board note width.`)
+    assert(isOptionalVerticalSize(item.boardHeight), `Note ${index + 1} has an invalid board note height.`)
     assert(item.widgetBoardId === undefined || isId(item.widgetBoardId), `Note ${index + 1} has an invalid board.`)
     assert(item.widgetHeight === undefined || item.widgetHeight === 'short' || item.widgetHeight === 'medium' || item.widgetHeight === 'tall', `Note ${index + 1} has an invalid widget height.`)
     assert(item.widgetGroup === undefined || (typeof item.widgetGroup === 'string' && item.widgetGroup.trim()), `Note ${index + 1} has an invalid widget group.`)
@@ -99,7 +101,7 @@ function validatePayload(value: unknown): BackupPayload {
   boardGroups.forEach((raw) => { const item = raw as Record<string, unknown>; assert(boardIds.has(item.boardId as string), `Board group ${item.id as string} refers to a missing board.`) })
   notes.forEach((raw) => { const item = raw as Record<string, unknown>; assert(item.collectionId === undefined || collectionIds.has(item.collectionId as string), `Note ${item.id as string} refers to a missing collection.`); assert(item.boardId === undefined || boardIds.has(item.boardId as string), `Note ${item.id as string} refers to a missing board.`); assert(item.widgetBoardId === undefined || boardIds.has(item.widgetBoardId as string), `Note ${item.id as string} refers to a missing board.`); assert(item.groupId === undefined || boardGroupIds.has(item.groupId as string), `Note ${item.id as string} refers to a missing board group.`) })
   webReferences.forEach((raw) => { const item = raw as Record<string, unknown>; assert(noteIds.has(item.noteId as string), `Web reference ${item.id as string} refers to a missing note.`) })
-  return { format: BACKUP_FORMAT, version: value.version as 1 | 2 | 3 | typeof BACKUP_VERSION, exportedAt: value.exportedAt, notes: notes as BackupPayload['notes'], collections: collections as Collection[], webReferences: webReferences as WebReference[], boards: boards as Board[], boardGroups: boardGroups as BoardGroup[] }
+  return { format: BACKUP_FORMAT, version: value.version as 1 | 2 | 3 | 4 | typeof BACKUP_VERSION, exportedAt: value.exportedAt, notes: notes as BackupPayload['notes'], collections: collections as Collection[], webReferences: webReferences as WebReference[], boards: boards as Board[], boardGroups: boardGroups as BoardGroup[] }
 }
 
 export async function exportBackup(): Promise<BackupPayload> {
