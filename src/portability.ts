@@ -129,6 +129,21 @@ export async function importBackup(input: unknown, mode: ImportMode): Promise<Im
   const webReferences = payload.webReferences.map((item) => ({ ...item, id: referenceIds.get(item.id)!, noteId: noteIds.get(item.noteId)! }))
   const boards = payload.boards.map((item) => ({ ...item, id: boardIds.get(item.id)! }))
   const boardGroups = payload.boardGroups.map((item) => ({ ...item, id: groupIds.get(item.id)!, boardId: boardIds.get(item.boardId)! }))
+  // Versions before persisted Ungrouped groups can contain cards without a group.
+  // Normalize them during import because a database upgrade does not run after an import.
+  for (const board of boards) {
+    const groupsForBoard = boardGroups.filter((group) => group.boardId === board.id)
+    let ungrouped = groupsForBoard.find((group) => group.name === 'Ungrouped')
+    if (!ungrouped) {
+      ungrouped = { id: nextId(usedGroups), boardId: board.id, name: 'Ungrouped', order: groupsForBoard.reduce((maximum, group) => Math.max(maximum, group.order), -1) + 1, columnSpan: 1 as const, verticalSize: 'normal' as const, collapsed: false }
+      boardGroups.push(ungrouped)
+      groupsForBoard.push(ungrouped)
+    }
+    const validGroupIds = new Set(groupsForBoard.map((group) => group.id))
+    notes.forEach((note) => {
+      if ((note.isWidget ? note.widgetBoardId : note.boardId) === board.id && (!note.groupId || !validGroupIds.has(note.groupId))) note.groupId = ungrouped.id
+    })
+  }
   await database.transaction('rw', database.notes, database.collections, database.webReferences, database.boards, database.boardGroups, async () => {
     if (mode === 'replace') { await database.boardGroups.clear(); await database.webReferences.clear(); await database.notes.clear(); await database.collections.clear(); await database.boards.clear() }
     await database.collections.bulkPut(collections)

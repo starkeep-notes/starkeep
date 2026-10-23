@@ -48,6 +48,30 @@ export class StarkeepDatabase extends Dexie {
         await Promise.all(boardNotes.map((note) => notes.update(note.id, { groupId: byName.get(note.widgetGroup?.trim() || 'Ungrouped') })))
       }
     })
+    this.version(5).stores({
+      notes: 'id, updatedAt, collectionId, boardId, deletedAt, widgetBoardId, widgetGroup, groupId',
+      collections: 'id, parentId, updatedAt',
+      webReferences: 'id, noteId, url',
+      boards: 'id, updatedAt',
+      boardGroups: 'id, boardId, order',
+    }).upgrade(async (transaction) => {
+      const notes = transaction.table('notes') as EntityTable<Note, 'id'>
+      const groups = transaction.table('boardGroups') as EntityTable<BoardGroup, 'id'>
+      const boards = await (transaction.table('boards') as EntityTable<Board, 'id'>).toArray()
+      const existingGroups = await groups.toArray()
+      const allNotes = await notes.toArray()
+      for (const board of boards) {
+        const boardGroups = existingGroups.filter((group) => group.boardId === board.id)
+        let ungrouped: BoardGroup | undefined = boardGroups.find((group) => group.name === 'Ungrouped')
+        if (!ungrouped) {
+          ungrouped = { id: crypto.randomUUID(), boardId: board.id, name: 'Ungrouped', order: boardGroups.length, columnSpan: 1, verticalSize: 'normal', collapsed: false }
+          await groups.add(ungrouped)
+          boardGroups.push(ungrouped)
+        }
+        const validGroupIds = new Set(boardGroups.map((group) => group.id))
+        await Promise.all(allNotes.filter((note) => (note.isWidget ? note.widgetBoardId : note.boardId) === board.id && (!note.groupId || !validGroupIds.has(note.groupId))).map((note) => notes.update(note.id, { groupId: ungrouped.id })))
+      }
+    })
   }
 }
 
