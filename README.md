@@ -26,7 +26,7 @@ Notes use a rich-text editor and can become cards on the board. Widgets have a v
 
 ## Boards
 
-Boards are stored locally with their widget layouts and note assignments. Select a note or widget on a board to reveal its actions, including an accessible board picker for moving it. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its notes and widgets to that board.
+Boards are stored locally with their widget layouts and note assignments. Create named board groups to arrange widgets; group names, order, spans, height, and collapsed state stay on this device. Existing widget labels migrate safely to matching groups. Select a note or widget on a board to reveal its actions, including an accessible board picker for moving it. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its notes and widgets to that board.
 
 ## Visual language
 
@@ -46,4 +46,4 @@ The `main` branch deploys through [GitHub Actions](./.github/workflows/deploy.ym
 
 ## Local-first storage
 
-The notebook will store data in IndexedDB in the browser. Storage belongs to the exact origin, so localhost, the deployed site, and any future custom domain have separate notebooks. Use **Backup & recovery** in the navigation to export a versioned JSON backup or import one from another origin/device. Imports are validated before writing; merge assigns new IDs when needed, while replace clears the current notebook only after confirmation. Backups preserve notes, collections, web references, boards, widget groups, and card layout settings. Version 1 backups remain importable.
+The notebook will store data in IndexedDB in the browser. Storage belongs to the exact origin, so localhost, the deployed site, and any future custom domain have separate notebooks. Use **Backup & recovery** in the navigation to export a versioned JSON backup or import one from another origin/device. Imports are validated before writing; merge assigns new IDs when needed, while replace clears the current notebook only after confirmation. Backups preserve notes, collections, web references, boards, persisted board groups, and card layout settings. Version 1 backups remain importable.

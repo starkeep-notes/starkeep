@@ -16,7 +16,9 @@ export type Note = {
   widgetSize?: 'small' | 'medium' | 'large' | 'wide'
   widgetHeight?: 'short' | 'medium' | 'tall'
   widgetBoardId?: string
+  /** @deprecated legacy display label, migrated to groupId on database upgrade. */
   widgetGroup?: string
+  groupId?: string
   createdAt: number
   updatedAt: number
   deletedAt?: number
@@ -27,6 +29,16 @@ export type Board = {
   name: string
   createdAt: number
   updatedAt: number
+}
+
+export type BoardGroup = {
+  id: string
+  boardId: string
+  name: string
+  order: number
+  columnSpan: 1 | 2 | 3 | 4
+  verticalSize: 'compact' | 'normal' | 'tall'
+  collapsed: boolean
 }
 
 export type Collection = {

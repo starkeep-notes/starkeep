@@ -1,11 +1,12 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Board, Collection, Note, WebReference } from './types'
+import type { Board, BoardGroup, Collection, Note, WebReference } from './types'
 
 export class StarkeepDatabase extends Dexie {
   notes!: EntityTable<Note, 'id'>
   collections!: EntityTable<Collection, 'id'>
   webReferences!: EntityTable<WebReference, 'id'>
   boards!: EntityTable<Board, 'id'>
+  boardGroups!: EntityTable<BoardGroup, 'id'>
 
   constructor() {
     super('starkeep')
@@ -25,6 +26,27 @@ export class StarkeepDatabase extends Dexie {
       collections: 'id, parentId, updatedAt',
       webReferences: 'id, noteId, url',
       boards: 'id, updatedAt',
+    })
+    this.version(4).stores({
+      notes: 'id, updatedAt, collectionId, boardId, deletedAt, widgetBoardId, widgetGroup, groupId',
+      collections: 'id, parentId, updatedAt',
+      webReferences: 'id, noteId, url',
+      boards: 'id, updatedAt',
+      boardGroups: 'id, boardId, order',
+    }).upgrade(async (transaction) => {
+      const notes = transaction.table('notes') as EntityTable<Note, 'id'>
+      const groups = transaction.table('boardGroups') as EntityTable<BoardGroup, 'id'>
+      const boards = await (transaction.table('boards') as EntityTable<Board, 'id'>).toArray()
+      const allNotes = await notes.toArray()
+      for (const board of boards) {
+        const boardNotes = allNotes.filter((note) => (note.isWidget ? note.widgetBoardId : note.boardId) === board.id)
+        const labels = [...new Set(boardNotes.map((note) => note.widgetGroup?.trim()).filter((label): label is string => Boolean(label)))]
+        const fallback = labels.length ? [] : ['Ungrouped']
+        const created = [...labels, ...fallback].map((name, order) => ({ id: crypto.randomUUID(), boardId: board.id, name, order, columnSpan: 1 as const, verticalSize: 'normal' as const, collapsed: false }))
+        await groups.bulkAdd(created)
+        const byName = new Map(created.map((group) => [group.name, group.id]))
+        await Promise.all(boardNotes.map((note) => notes.update(note.id, { groupId: byName.get(note.widgetGroup?.trim() || 'Ungrouped') })))
+      }
     })
   }
 }
