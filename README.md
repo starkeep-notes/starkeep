@@ -24,6 +24,10 @@ npm run build
 
 Notes use a rich-text editor and can become cards on the board. Widgets have a visual builder and a syntax editor that edit the same widget content. Switching an existing rich-text note to a widget converts its content to plain widget text; the app asks for confirmation before formatting is lost. Switching a widget back to a note keeps its text, but does not restore previous rich formatting. Changes are saved locally in this browser.
 
+## Boards
+
+Boards are stored locally with their widget layouts. Select a widget to reveal its edit, resize, grouping, pin, duplicate, hide, and layout actions. Select the active board again, double-click its name, or use the board settings panel to rename or delete it without relying on a pointer gesture. A board cannot be deleted when it is the last board; when another board exists, deleting a board moves its widgets to that board.
+
 ## Visual language
 
 The designs in [`references/`](./references/) are inspiration, not runtime assets. The [dashboard](./references/note-widget/keep-dashboard.html), [widget builder](./references/note-widget/keep-widget-builder.html), and [syntax editor](./references/note-widget/keep-widget-syntax.html) illustrate the compact notebook rail, expressive widget cards, and side-by-side editing. The sample screens also show [tablet](./references/1keep%20%E2%80%94%20note%20app%20sample%20screens_files/tablet-two-pane.html) and [mobile](./references/1keep%20%E2%80%94%20note%20app%20sample%20screens_files/mobile-editor.html) layouts.
