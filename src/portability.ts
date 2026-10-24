@@ -26,7 +26,7 @@ const isOptionalTimestamp = (value: unknown): value is number | undefined => val
 const isOptionalBoolean = (value: unknown): value is boolean | undefined => value === undefined || typeof value === 'boolean'
 const isOptionalWidgetStyle = (value: unknown) => value === undefined || value === 'cream' || value === 'yellow' || value === 'blue' || value === 'green' || value === 'ink'
 const isOptionalWidgetSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large' || value === 'wide'
-const isOptionalBoardSize = (value: unknown) => value === undefined || value === 'small' || value === 'medium' || value === 'large'
+const isOptionalBoardSize = (value: unknown) => value === undefined || value === 'tiny' || value === 'small' || value === 'medium' || value === 'large'
 const isOptionalVerticalSize = (value: unknown) => value === undefined || value === 'short' || value === 'medium' || value === 'tall'
 const isOptionalWidgetOrder = (value: unknown) => value === undefined || (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0)
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message) }
