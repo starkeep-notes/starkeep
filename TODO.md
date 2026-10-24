@@ -6,6 +6,16 @@ Starkeep should feel like a personal space a person builds over time, not a note
 
 The product question is **“What do you want to keep close?”** rather than **“What do you want to write?”** Notes, collections, and web references remain important, but are building blocks alongside reminders, quotes, trackers, lists, and other board cards. Prioritize quick capture, a small set of useful and expressive card types, and easy arranging before expanding the advanced widget builder.
 
+### Image library
+- [ ] Bundled static library with tags, attribution, and thumbnails.
+- [ ] Image import pipeline with downscaling, format selection, and transparency handling.
+- [ ] IndexedDB-backed image library, including storage estimates and export.
+- [ ] Local folder indexing with explicit permission and missing-file handling.
+- [ ] Advanced storage tools, batch compression, duplicate detection, and optional OPFS storage.
+
+
+### Personal space
+
 - [x] Rework the Board into a personal-space grid with summary cards, prominent actions, and Keep-inspired widget hierarchy.
 - [x] Polish the compact sidebar rail and active navigation states to match the reference dashboard.
 - [x] Restructure widget creation into a three-column template, customization, and live-preview builder.
