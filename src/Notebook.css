@@ -313,6 +313,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Board selection keeps advanced actions quiet until a card or group is intentionally selected. */
 .board-widget-group { border-radius: 14px; }
+.group-drop-target { display: grid; min-height: 24px; margin: 6px 4px; place-items: center; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: 11px; font-weight: 700; opacity: .7; transition: background .15s ease, border-color .15s ease, color .15s ease; }
+.group-drop-target.is-over { border-color: var(--ink); background: var(--accent); color: var(--ink); opacity: 1; }
+.group-drop-target span { overflow: hidden; }
+
 .board-widget-group.selected { outline: 3px solid var(--accent); outline-offset: 5px; background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .group-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 5px; }
 .group-actions button, .group-size-picker, .note-size-picker, .widget-size-picker { min-height: 28px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; background: var(--surface); color: var(--ink); font-size: 10px; }
